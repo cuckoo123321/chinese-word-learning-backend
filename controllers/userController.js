@@ -1,7 +1,6 @@
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const itemsPerPage = 30;
 const jwt = require('jsonwebtoken');
 const generateToken = require('../middleware/JWT');
 
@@ -10,9 +9,9 @@ const userController = {
         res.render('user/userAdd');
     },
     handleAdd: (req, res, next) => {
-        const { user_name, user_password, user_email, user_gender, user_birthdate } = req.body;
+        const { user_name, user_password, user_disabled } = req.body;
 
-        if(!user_name || !user_password || !user_email ){
+        if(!user_name || !user_password || !user_disabled ){
             req.flash('errorMessage', '缺少必要欄位');
             return next();
         }
@@ -25,9 +24,7 @@ const userController = {
             userModel.add({
                 user_name, 
                 user_password: hash, 
-                user_email, 
-                user_gender, 
-                user_birthdate
+                user_disabled
             },(err) => {
                 if(err){
                     req.flash('errorMessage', err.toString());
@@ -37,40 +34,16 @@ const userController = {
             })
         })
     },
-    // getAll: (req, res)=>{
-    //     userModel.getAll((err, results)=>{
-    //         if(err){
-    //             console.log(err);
-    //         }
-    //         res.render('user/userList',{
-    //             user: results,
-    //         });
-    //     })
-    // },
-
-    getAll: (req, res) => {
-        const page = parseInt(req.query.page) || 1;
-        const offset = (page - 1) * itemsPerPage;
-        const limit = itemsPerPage;
-
-        userModel.getAll(offset, limit, (err, results) => {
+    getAll: (req, res)=>{
+        userModel.getAll((err, results)=>{
             if(err){
                 console.log(err);
-                return res.status(500).send('Internal Server Error');
             }
-            userModel.getCount((err, count) => {
-                if(err){
-                    console.log(err);
-                    return res.status(500).send('Internal Server Error');
-                }
-                const totalPages = Math.ceil(count / itemsPerPage);
-                res.render('user/userList', {
-                    user: results,
-                    currentPage: page,
-                    totalPages: totalPages,
-                });
+            res.render('user/userList',{
+                user: results,
+                user_name: req.session.user_name
             });
-        });
+        })
     },
 
     update:(req, res)=> {
@@ -88,9 +61,7 @@ const userController = {
             userModel.update(
                 req.body.user_name, 
                 hash,
-                req.body.user_email, 
-                req.body.user_gender, 
-                req.body.user_birthdate, 
+                req.body.user_disabled, 
                 user_updated_at,
                 req.params.id,
                 (err) => {
@@ -117,6 +88,19 @@ const userController = {
             }
         })
     },
+    search: (req, res) => {
+        const keyword = req.query.keyword;
+        userModel.search(keyword, (err, results) => {
+            if (err) {
+                console.log('Error:', err);
+                return res.status(500).send('搜尋失敗');
+            }
+            res.render('user/userList', {
+                user: results,
+                user_name: req.session.user_name
+            });
+        });
+    },   
 
     // 前端會員登入
     userLogin: async (req, res) => {
@@ -199,19 +183,18 @@ const userController = {
 
     //前端註冊會員
     userRegister: async (req, res) => {
-        const { user_name, user_password, user_email, user_gender, user_birthdate } = req.body;
+        const { user_name, user_password } = req.body;
       
         // 檢查資訊是否完整
-        if (!user_name || !user_password || !user_email) {
+        if (!user_name || !user_password) {
           return res.status(400).json({ success: false, message: '請提供完整的註冊資訊' });
         }
       
         // 正則表達式驗證
         const usernameRegex = /^[a-zA-Z0-9]{6,12}$/;
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,30}$/;
       
-        if (!usernameRegex.test(user_name) || !passwordRegex.test(user_password) || !emailRegex.test(user_email)) {
+        if (!usernameRegex.test(user_name) || !passwordRegex.test(user_password)) {
           return res.status(400).json({ success: false, message: '請提供正確的註冊資訊' });
         }
       
@@ -234,7 +217,7 @@ const userController = {
             try {
               // 在這裡執行註冊邏輯，將用戶資料存入數據庫
               // hash 後的密碼傳遞給 registerUser 函數
-              const userData = await userModel.registerUser(user_name, hash, user_email, user_gender, user_birthdate);
+              const userData = await userModel.registerUser(user_name, hash);
               res.status(201).json({ success: true, message: '註冊成功', user: userData });
             } catch (error) {
               console.error('註冊失敗:', error);
@@ -253,35 +236,22 @@ const userController = {
         // 檢查新密碼格式
         //const newPassword = req.body.user_password;
         console.log('New password:', newPassword);//要刪除
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,30}$/;
 
         if (!passwordRegex.test(newPassword)) {
             console.log('新密碼格式不正確')//delete
             return res.status(400).json({ success: false, message: '新密碼格式不正確' });
         }
 
-        // 檢查 Email 格式
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(req.body.user_email)) {
-            console.log('email 不正確')//delete
-            return res.status(400).json({ success: false, message: 'Email 格式不正確' });
-        }
-
         bcrypt.hash(req.body.user_password, saltRounds, (err, hash) => {
             if (err) return res.status(500).json({ error: 'Hashing error' });    
             console.log('Hashed password:', hash);//delete
 
-            
-            // 轉換日期格式
-            const user_birthdate = new Date(req.body.user_birthdate).toISOString().split('T')[0];
             const user_updated_at = new Date();
 
             userModel.FrontendUpdate(
                 req.body.user_name,
-                hash,
-                req.body.user_email,
-                req.body.user_gender,
-                user_birthdate,
+                hash,               
                 user_updated_at,
                 req.params.id,
                 (err, results) => {

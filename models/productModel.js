@@ -1,19 +1,24 @@
 const db = require('../db');
 const path = require('path');
 
+
 const productModel = {
     add: (product, cb) => {
         db.query(
-            `INSERT INTO products(product_number, product_path, product_title, product_price, product_discount, product_description, product_category, product_stock, product_publish) values(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO products(product_number, product_rank, product_title, product_translation,product_category, product_author, product_publisher, product_date, product_description, product_description_foreign, product_path, product_link, product_publish) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
-                product.product_number, 
-                product.product_path, 
+                product.product_number,
+                product.product_rank, 
                 product.product_title, 
-                product.product_price, 
-                product.product_discount, 
-                product.product_description, 
+                product.product_translation,
                 product.product_category, 
-                product.product_stock, 
+                product.product_author, 
+                product.product_publisher, 
+                product.product_date,
+                product.product_description, 
+                product.product_description_foreign,
+                product.filename, // 使用 filename 替代 product_path 
+                product.product_link,
                 product.product_publish
             ],
             (err, results) => {
@@ -23,25 +28,14 @@ const productModel = {
         );
     },
 
-    getAll:(offset, limit, cb) => {
+    getAll:(cb) => {
         db.query(
-            `SELECT * FROM products ORDER BY product_number ASC LIMIT ?, ?`,
-            [offset, limit],
+            `SELECT * FROM products ORDER BY product_rank ASC`,
             (err, results) => {
                 if(err) return cb(err);
                 cb(null, results);
             }
-        )
-    },
-    getCount:(cb)=> {
-        db.query(
-            `SELECT COUNT(*) AS count FROM products`, (err, results) => 
-            {
-                if(err) return cb(err);
-                const count = results[0].count;
-                cb(null, count);
-            }
-        )
+        );
     },
 
     delete: (product_id, cb) => {
@@ -80,19 +74,23 @@ const productModel = {
     },
 
 
-    update: (product_number, newImageFilename, product_title, product_price, product_discount, product_description, product_category, product_stock, product_publish, product_updated_at, product_id, cb) => {
-        const query = 'UPDATE products SET product_number = ?, product_path = ?, product_title = ?, product_price = ?, product_discount = ?, product_description = ?, product_category = ?, product_stock = ?, product_publish = ?, product_updated_at = ? WHERE product_id = ?';
+    update: (product_number, product_rank,  product_title, product_translation,product_category, product_author,product_publisher, product_date, product_description,  product_description_foreign, newImageFilename, product_link, product_publish, product_updated_at, product_id, cb) => {
+        const query = 'UPDATE products SET product_number = ?,product_rank=?, product_title = ?, product_translation = ?, product_category = ?, product_author = ?,product_publisher = ?, product_date = ?, product_description = ?, product_description_foreign = ?, product_path = ?, product_link = ?, product_publish = ?, product_updated_at = ? WHERE product_id = ?';
 
         db.query(query,
             [
                 product_number, 
-                newImageFilename, // 將新圖片的檔名作為參數傳入
+                product_rank,
                 product_title, 
-                product_price, 
-                product_discount, 
-                product_description, 
+                product_translation,
                 product_category, 
-                product_stock, 
+                product_author,
+                product_publisher, 
+                product_date, 
+                product_description,
+                product_description_foreign,
+                newImageFilename, // 將新圖片的檔名作為參數傳入
+                product_link,
                 product_publish, 
                 product_updated_at,
                 product_id
@@ -104,10 +102,22 @@ const productModel = {
         );
     },
 
+    search:(keyword, cb) => {
+        // 使用 SQL 查詢進行模糊搜尋
+        db.query(
+          'SELECT * FROM products WHERE product_number LIKE ? OR product_title LIKE ? OR product_category LIKE ? OR product_author LIKE ? OR product_publisher LIKE ? ',
+          [`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`],
+          (err, results) => {
+              if (err) return cb(err);
+              cb(null, results);
+          }
+        );
+      },
+
     // Function to get data from the database (API)
     getProductData: () => {
         return new Promise((resolve, reject) => {
-        db.query(`SELECT * FROM products WHERE product_publish = 'publish' `, (error, results) => {
+        db.query(`SELECT * FROM products WHERE product_publish = 'publish' ORDER BY product_rank ASC `, (error, results) => {
             if (error) {
             reject(error);
             } else {
@@ -131,26 +141,6 @@ const productModel = {
             cb(null, results[0]);// 找到商品，回傳結果
         });
     },
-
-    updateProductStock: (productId, newStock) => {
-        return new Promise((resolve, reject) => {
-          db.query(
-            'UPDATE products SET product_stock = ? WHERE product_id = ?',
-            [newStock, productId],
-            (err, result) => {
-              if (err) {
-                console.error('Database error:', err);
-                return reject(err);
-              }
-              resolve({
-                success: true,
-                message: 'Product stock updated successfully',
-              });
-            }
-          );
-        });
-    },
-
 
 
 

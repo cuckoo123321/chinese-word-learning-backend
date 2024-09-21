@@ -7,21 +7,16 @@ const app = express();
 const port = process.env.PORT || 5001;
 const adminController = require('./controllers/adminController');
 const userController = require('./controllers/userController');
-const eventController = require('./controllers/eventController');
+const articleController = require('./controllers/articleController');
 const carouselController = require('./controllers/carouselController');
-const productController = require('./controllers/productController');
-//const productReviewController = require('./controllers/productReviewController');
 const favoriteController = require('./controllers/favoriteController');
-const cartController = require('./controllers/cartController');
-const recipientController = require('./controllers/recipientController');
-const orderController = require('./controllers/orderController');
+const productController = require('./controllers/productController')
+
 
 const path = require('path');
 const apiRoutes = require('./routes/apiRoutes'); //API路由
 const cors = require('cors'); //同源政策
 require('dotenv').config();
-const ECPayMiddleware = require('./middleware/ECPay');
-
 
 
 //設置視圖引擎
@@ -64,18 +59,15 @@ app.get('/',(req, res) => {
   res.render('index',{ admin_full_name });// 傳遞變數到模板
 });
 
-//order後台
-app.get('/orderList',orderController.handleGetAllOrders);
-app.get('/delete_order/:number', orderController.delete);
-app.post('/update_order_delivered/:id', orderController.updateIsDelivered);
+
 
 //admin
 app.get('/login', adminController.login);
 app.post('/login', adminController.handleLogin, redirectBack);
 app.get('/logout', adminController.logout);
-app.get('/add', adminController.add);
-app.post('/add', adminController.handleAdd, redirectBack);
-app.get('/list', adminController.getAll);
+app.get('/adminAdd', adminController.add);
+app.post('/adminAdd', adminController.handleAdd, redirectBack);
+app.get('/adminList', adminController.getAll);
 app.get('/delete_admin/:id', adminController.delete);
 app.get('/update_admin/:id', adminController.update);
 app.post('/update_admin/:id', adminController.handleUpdate);
@@ -88,21 +80,23 @@ app.get('/userList', userController.getAll);
 app.get('/update_user/:id', userController.update);
 app.post('/update_user/:id', userController.handleUpdate);
 app.get('/delete_user/:id', userController.softDelete);
+app.get('/userSearch', userController.search);
 //user前端用 API
 app.post('/userLogin', userController.userLogin);
 app.get('/user', userController.getUserInfo);
 app.post('/userRegister', userController.userRegister);
 app.put('/userUpdate/:id', userController.FrontendHandleUpdate);
 
-//event
-app.get('/eventAdd', eventController.add);
-app.post('/eventAdd', eventController.handleAdd, redirectBack);
-app.get('/eventList', eventController.getAll);
-app.get('/update_event/:id', eventController.update);
-app.post('/update_event/:id', eventController.handleUpdate);
-app.get('/delete_event/:id', eventController.delete);
-//event 前端用API
-app.get('/eventData', eventController.getEventData);
+//article
+app.get('/articleAdd', articleController.add);
+app.post('/articleAdd', articleController.handleAdd, redirectBack);
+app.get('/articleList', articleController.getAll);
+app.get('/update_article/:id', articleController.update);
+app.post('/update_article/:id', articleController.handleUpdate);
+app.get('/delete_article/:id', articleController.delete);
+app.get('/articleSearch', articleController.search);
+//article 前端用API
+app.get('/article', articleController.getArticleData);
 
 //carousel
 app.get('/carouselAdd', carouselController.add);
@@ -111,6 +105,7 @@ app.get('/carouselList', carouselController.getAll);
 app.get('/update_carousel/:id', carouselController.update);
 app.post('/update_carousel/:id', carouselController.handleUpdate);
 app.get('/delete_carousel/:id', carouselController.delete);
+app.get('/carouselSearch', carouselController.search);
 //carousel前端API
 app.get('/carousel', carouselController.getCarouselData);
 
@@ -123,42 +118,17 @@ app.get('/productList', productController.getAll);
 app.get('/update_product/:id', productController.update);
 app.post('/update_product/:id', productController.handleUpdate);
 app.get('/delete_product/:id', productController.delete);
+app.get('/productSearch', productController.search);
 //product前端用API
 app.get('/:id', productController.getProductById);
 app.put('/update_productStock', productController.updateProductStock)
 
-//productReview
-//app.get('/productReviewList', productReviewController.getAll);
-//app.get('/delete_productReview/:id', productReviewController.delete);
 
 //favorite
 app.post('/favoriteAdd', favoriteController.addToFavorites);
 app.get('/favoriteList/:user_id?', favoriteController.getFavorite);
 app.delete('/favoriteRemove/:favorite_id', favoriteController.removeFromFavorites);
-
-//cart
-app.post('/addToCart', cartController.addToCart);
-app.get('/cartList/:user_id?', cartController.getCartItems);
-app.put('/updateQuantity/:user_id/:product_id', cartController.updateCartQuantity);
-app.delete('/deleteCartItem/:user_id/:product_id', cartController.deleteCartItem);
-
-//recipient
-app.post('/addRecitient', recipientController.addRecipient);
-
-//order前端用API
-app.post('/orderAdd', orderController.createOrder);
-app.get('/order/:order_id', orderController.getOrderById);
-app.post('/paymentAdd/:order_id', orderController.createPayment);
-app.get('/getPaymentResult/:payment_id', orderController.getPaymentResult);
-app.get('/orderList/:user_id', orderController.getAllOrdersByUserId);
-
-
-//app.post('/return', orderController.paymentReturn);
-//app.get('/clientReturn', orderController.clientReturn);
-//app.post('/payment/:order_id', orderController.GetCheckValue);
-
-//app.get('/result', orderController.result);
-//app.post('/result', orderController.GetCheckValue);
+app.get('/isFavorite/:user_id/:product_id', favoriteController.checkIfFavorite);
 
 
 //啟動伺服器

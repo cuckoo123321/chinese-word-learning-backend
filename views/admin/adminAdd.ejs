@@ -19,7 +19,8 @@
                 </div>
                 <% } %>
     
-                <form method="POST" action="/add" data-bitwarden-watching="1">
+                <% if (admin_permission_level === 'Super') { %>
+                <form method="POST" action="/adminAdd" data-bitwarden-watching="1">
                     <div class="form-group list">
                         <label for="admin_full_name" class="form-label">姓名：</label>
                         <input name="admin_full_name" type="text" class="form-control" placeholder="請輸入管理員名稱">
@@ -66,17 +67,22 @@
                     </div>
     
                     <div class="form-group list mt-4">
-                        <input type="submit" class="btn btn-success" />
-                        <button type="button" class="btn btn-warning" id="clearButton">清空</button>
-                        <a class="btn btn-secondary" href="/list">返回</a>
+                        <input type="submit" class="btn btn-success btn_margin" />
+                        <a class="btn btn-secondary btn_margin" href="adminList">取消</a>
                     </div>
                 </form>
+                <% } else { %>
+                    <p style="text-align: center; color: red; margin-top: 40px;">＊您沒有權限進行此操作＊</p>
+                    <div style="text-align: center; margin-top: 40px;">
+                        <a class="btn btn-secondary" href="/adminList">返回</a>
+                    </div>
+                <% } %>
             </div>
             <div class="col-md-3"></div>
         </div>
         <% } else { %>
             <div class="loginContainer">
-                <p class="loginText">歡迎使用中日同形詞管理系統</p>
+                <p class="loginText">歡迎使用「記憶術提升漢字詞學習」</p>
                 <p class="loginText">請系統管理員登入系統</p>  
             </div>
         <% } %>  
@@ -84,57 +90,6 @@
     
 
     <script>
-        //清空欄位
-        $(document).ready(function(){
-            $('#clearButton').click(function(){
-                $('form').find(':input').not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
-            })
-        })
-
-        //把資料存進 localStorage
-        $(document).ready(function(){
-            const formData = JSON.parse(localStorage.getItem('formData')) || {};
-            //把儲存的資料填進表單，但要排除密碼
-            for(const key in formData){
-                if(formData.hasOwnProperty(key) && key !== 'admin_password'){
-                    if(key === 'admin_disabled'){
-                        $(`[name="${key}"][value="${formData[key]}"]`).prop('checked', true);
-                    }else{
-                        $(`[name="${key}"]`).val(formData[key]);
-                    }                    
-                }
-            }
-            //把 input 資料存進 localStorage，但要排除密碼
-            $('form :input').on('input', function(){
-                if(this.name !== 'admin_password'){
-                    if(this.name === 'admin_disabled'){
-                        formData[this.name] = $('input[name="admin_disabled"]:checked').val();
-                    }else{
-                        formData[this.name] = $(this).val();
-                    }
-                    localStorage.setItem('formData', JSON.stringify(formData));
-                } 
-            });
-
-            //按提交表單或取消返回上頁時，清空 localStorage
-            $('form').submit(function(){
-                //檢查是否有錯誤訊息
-                if (errorMessages.length === 0 || !hasErrors(errorMessages)) {
-                // 如果沒有錯誤訊息、實際錯誤，清空 localStorage
-                localStorage.removeItem('formData');
-                }               
-            })
-            $('#clearButton').click(function(){
-                localStorage.removeItem('formData');
-            })
-        })
-
-        // 檢查否存在實際錯誤
-        function hasErrors(errorMessages) {
-            return errorMessages.filter(function() {
-                return $(this).text().trim().length > 0;
-            }).length > 0;
-        }
     </script>
 </body>
 </html>

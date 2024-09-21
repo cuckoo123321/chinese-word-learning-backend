@@ -4,10 +4,11 @@ const path = require('path');
 const carouselModel = {
     add: (carousel, cb) => {
         db.query(
-            `INSERT INTO carousels(carousel_title, carousel_path, carousel_publish) values(?, ?, ?)`,
+            `INSERT INTO carousels(carousel_title, carousel_path, carousel_link, carousel_publish) values(?, ?, ?, ?)`,
             [
                 carousel.carousel_title,
                 carousel.carousel_path,
+                carousel.carousel_link,
                 carousel.carousel_publish
             ],
             (err, results) => {
@@ -66,12 +67,13 @@ const carouselModel = {
   },
 
 
-  update: (carousel_title, carousel_updated_at, carousel_publish, carousel_id, newImageFilename, cb) => {
-    const query = 'UPDATE carousels SET carousel_title = ?, carousel_updated_at = ?, carousel_publish = ?, carousel_path = ? WHERE carousel_id = ?';
+  update: (carousel_title, carousel_link, carousel_updated_at, carousel_publish, carousel_id, newImageFilename, cb) => {
+    const query = 'UPDATE carousels SET carousel_title = ?, carousel_link = ?, carousel_updated_at = ?, carousel_publish = ?, carousel_path = ? WHERE carousel_id = ?';
 
     db.query(query,
         [
             carousel_title,
+            carousel_link,
             carousel_updated_at,
             carousel_publish,
             newImageFilename, // 將新圖片的檔名作為參數傳入
@@ -83,6 +85,18 @@ const carouselModel = {
         }
     );
   },
+
+  search:(keyword, cb) => {
+    // 使用 SQL 查詢進行模糊搜尋
+    db.query(
+      'SELECT * FROM carousels WHERE carousel_title LIKE ? OR carousel_path LIKE ?',
+      [`%${keyword}%`, `%${keyword}%`],
+      (err, results) => {
+          if (err) return cb(err);
+          cb(null, results);
+      }
+    );
+  },  
 
   // Function to get carousel data from the database (API)
   getCarouselData: () => {

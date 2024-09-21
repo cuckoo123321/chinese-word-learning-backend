@@ -3,13 +3,11 @@ const db = require('../db');
 const userModel = {
     add: (user, cb) =>{
         db.query(
-            `INSERT INTO users(user_name, user_password, user_email, user_gender, user_birthdate) values (?, ?, ?, ?, ?)`,
+            `INSERT INTO users(user_name, user_password, user_disabled) values (?, ?, ?)`,
             [
                 user.user_name,
                 user.user_password,
-                user.user_email,
-                user.user_gender,
-                user.user_birthdate
+                user.user_disabled
             ],
             (err, results)=>{
                 if(err) return cb(err);
@@ -18,26 +16,16 @@ const userModel = {
         )
     },
 
-    getAll:(offset, limit, cb) => {
+    getAll: (cb) =>{
         db.query(
-            `SELECT * FROM users ORDER BY user_created_at DESC LIMIT ?, ?`,
-            [offset, limit],
-            (err, results) => {
-                if(err) return cb(err);
-                cb(null, results);
-            }
-        )
+          `SELECT * FROM users ORDER BY user_created_at`,
+          (err, results) => {
+            if(err) return cb (err);
+            cb(null, results);
+          }
+        );
     },
-    getCount:(cb)=> {
-        db.query(
-            `SELECT COUNT(*) AS count FROM users`, (err, results) => 
-            {
-                if(err) return cb(err);
-                const count = results[0].count;
-                cb(null, count);
-            }
-        )
-    },
+
     getUpdate:(user_id, cb)=>{
         db.query(
             `SELECT * FROM users WHERE user_id = ?`,[user_id],
@@ -47,10 +35,10 @@ const userModel = {
             }
         );
     },
-    update: (user_name, user_password, user_email, user_gender, user_birthdate, user_updated_at, user_id, cb) => {
+    update: (user_name, user_password, user_disabled, user_updated_at, user_id, cb) => {
         db.query(
-            `UPDATE users SET user_name = ?, user_password = ?, user_email = ?, user_gender = ?, user_birthdate = ?, user_updated_at = ? WHERE user_id = ?`,
-            [ user_name, user_password, user_email, user_gender, user_birthdate, user_updated_at, user_id ],
+            `UPDATE users SET user_name = ?, user_password = ?, user_disabled = ?, user_updated_at = ? WHERE user_id = ?`,
+            [ user_name, user_password, user_disabled, user_updated_at, user_id ],
             (err, results) => {
                 if(err) return cb (err);
                 cb(null);
@@ -65,6 +53,18 @@ const userModel = {
             }
         )
     },
+
+    search:(keyword, cb) => {
+        // 使用 SQL 查詢進行模糊搜尋
+        db.query(
+          'SELECT * FROM users WHERE user_name LIKE ? OR user_disabled LIKE ?',
+          [`%${keyword}%`, `%${keyword}%`],
+          (err, results) => {
+              if (err) return cb(err);
+              cb(null, results);
+          }
+        );
+      },  
 
     //Function to get data from the database (API)
     getUserData: (username, cb) => {
@@ -104,10 +104,10 @@ const userModel = {
       },
     
 
-    registerUser: (user_name, user_password, user_email, user_gender, user_birthdate) => {
+    registerUser: (user_name, user_password) => {
         return new Promise((resolve, reject) => {          
-            db.query('INSERT INTO users (user_name, user_password, user_email, user_gender, user_birthdate) VALUES (?, ?, ?, ?, ?)', 
-                [user_name, user_password, user_email, user_gender, user_birthdate], (err, result) => {
+            db.query('INSERT INTO users (user_name, user_password) VALUES (?, ?)', 
+                [user_name, user_password], (err, result) => {
                 if (err) {
                 console.error('Database error:', err);
                 return reject(err);
@@ -117,9 +117,6 @@ const userModel = {
                 resolve({
                 user_id: result.insertId,
                 user_name: user_name,
-                user_email: user_email,
-                user_gender: user_gender,
-                user_birthdate: user_birthdate,
                 });
             });
         });
@@ -133,17 +130,15 @@ const userModel = {
             if (err) {
               return cb({ success: false, message: '伺服器錯誤' });
             }
-            // 如果找到了相同的帳號，返回 true，表示已存在
-            // 否則返回 false，表示帳號不存在
             return cb(null, results.length > 0);
           }
         );
     },
 
-    FrontendUpdate: (user_name, user_password, user_email, user_gender, user_birthdate, user_updated_at, user_id, cb) => {
+    FrontendUpdate: (user_name, user_password, user_updated_at, user_id, cb) => {
         db.query(
-            `UPDATE users SET user_name = ?, user_password = ?, user_email = ?, user_gender = ?, user_birthdate = ?, user_updated_at = ? WHERE user_id = ?`,
-            [user_name, user_password, user_email, user_gender, user_birthdate, user_updated_at, user_id],
+            `UPDATE users SET user_name = ?, user_password = ?, user_updated_at = ? WHERE user_id = ?`,
+            [user_name, user_password, user_updated_at, user_id],
             (err, results) => {
                 if (err) return cb(err);
                 cb(null, results);
@@ -151,17 +146,6 @@ const userModel = {
         );
     },
 
-    // getUserData: () => {
-    //     return new Promise((resolve, reject) => {
-    //       db.query(`SELECT * FROM users WHERE user_disabled = 0 `, (error, results) => {
-    //         if (error) {
-    //           reject(error);
-    //         } else {
-    //           resolve(results);
-    //         }
-    //       });
-    //     });
-    //   },
 }
 
 module.exports = userModel;

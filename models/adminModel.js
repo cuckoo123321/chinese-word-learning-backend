@@ -1,6 +1,5 @@
 const db = require('../db');
 
-
 const adminModel = {
     get: (admin_name, cb) => {
         // 在資料庫中查找帳號
@@ -38,30 +37,24 @@ const adminModel = {
     )
   },
 
-  // getAll: (cb) =>{
-  //   db.query(
-  //     `SELECT * FROM admins`,
-  //     (err, results) => {
-  //       if(err) return cb (err);
-  //       cb(null, results);
-  //     }
-  //   );
-  // },
-
-  getAll:(offset, limit, cb)=>{
-    db.query(`SELECT * FROM admins ORDER BY admin_created_at DESC LIMIT ?, ?`, 
-    [offset, limit],
-    (err,results)=>{
-      if(err) return cb(err);
-      cb(null, results);
+  findByName: (admin_name, cb) => {
+    const query = 'SELECT * FROM admins WHERE admin_name = ?';
+    db.query(query, [admin_name], (err, results) => {
+        if (err) {
+            return cb(err);
+        }
+        cb(null, results.length > 0 ? results[0] : null);
     });
   },
-  getCount:(cb)=>{
-    db.query(`SELECT COUNT(*) AS count FROM admins`, (err, results)=>{
-      if (err) return cb(err);
-      const count = results[0].count;
-      cb(null,count);
-    })
+
+  getAll: (cb) =>{
+    db.query(
+      `SELECT * FROM admins ORDER BY admin_created_at`,
+      (err, results) => {
+        if(err) return cb (err);
+        cb(null, results);
+      }
+    );
   },
 
   delete: (admin_id, cb) => {
@@ -70,6 +63,15 @@ const adminModel = {
       cb(null);
     });
   },
+
+  countSuperAdmins: (cb) => {
+    db.query('SELECT COUNT(*) AS count FROM admins WHERE admin_permission_level = "Super"', (err, results) => {
+        if (err) return cb(err);
+        const count = results[0].count;
+        cb(null, count);
+    });
+},
+
 
   getUpdate:(admin_id, cb)=>{
     db.query(
@@ -80,14 +82,56 @@ const adminModel = {
       }
     );
   },
-  update: (admin_name, admin_password, admin_full_name, admin_email, admin_permission_level, admin_disabled, admin_updated_at,admin_id, cb) => {
-    db.query('UPDATE admins SET admin_name = ?, admin_password = ?, admin_full_name = ?, admin_email = ?, admin_permission_level = ?, admin_disabled = ? , admin_updated_at =? WHERE admin_id = ?', 
-        [ admin_name, admin_password, admin_full_name, admin_email, admin_permission_level, admin_disabled, admin_updated_at, admin_id],
-        (err, results) => {
-            if (err) return cb(err);
-            cb(null);
-        });
-  },
+// 如果提供新密碼時的更新
+updateWithPassword: (admin_name, hash, admin_full_name, admin_email, admin_permission_level, admin_disabled, admin_updated_at, id, cb) => {
+  const query = `
+      UPDATE admins 
+      SET 
+          admin_name = ?, 
+          admin_password = ?, 
+          admin_full_name = ?, 
+          admin_email = ?, 
+          admin_permission_level = ?, 
+          admin_disabled = ?, 
+          admin_updated_at = ? 
+      WHERE admin_id = ?
+  `;
+  const params = [admin_name, hash, admin_full_name, admin_email, admin_permission_level, admin_disabled, admin_updated_at, id];
+
+  db.query(query, params, (err, results) => {
+      if (err) return cb(err);
+      cb(null, results);
+  });
+},
+
+// 如果未提供新密碼時的更新
+updateWithoutPassword: (admin_name, admin_full_name, admin_email, admin_permission_level, admin_disabled, admin_updated_at, id, cb) => {
+  const query = `
+      UPDATE admins 
+      SET 
+          admin_name = ?, 
+          admin_full_name = ?, 
+          admin_email = ?, 
+          admin_permission_level = ?, 
+          admin_disabled = ?, 
+          admin_updated_at = ? 
+      WHERE admin_id = ?
+  `;
+  const params = [admin_name, admin_full_name, admin_email, admin_permission_level, admin_disabled, admin_updated_at, id];
+
+  db.query(query, params, (err, results) => {
+      if (err) return cb(err);
+      cb(null, results);
+  });
+},
+countActiveSuperAdmins: (cb) => {
+  db.query('SELECT COUNT(*) AS count FROM admins WHERE admin_permission_level = "Super" AND admin_disabled = 0', (err, results) => {
+      if (err) return cb(err);
+      const count = results[0].count;
+      cb(null, count);
+  });
+},
+
  
   search:(keyword, cb) => {
     // 使用 SQL 查詢進行模糊搜尋
@@ -95,12 +139,11 @@ const adminModel = {
       'SELECT * FROM admins WHERE admin_name LIKE ? OR admin_full_name LIKE ? OR admin_email LIKE ? OR admin_permission_level LIKE ? OR admin_created_at LIKE ? OR admin_updated_at LIKE ?',
       [`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`],
       (err, results) => {
-        if (err) return cb(err);
-        cb(null, results);
+          if (err) return cb(err);
+          cb(null, results);
       }
     );
-  },
-  
+  },  
 
 }
 

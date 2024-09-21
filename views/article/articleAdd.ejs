@@ -3,15 +3,21 @@
 <head>
     <%- include('../template/head') %>
     <%- include('../../css/addUpdateStyle') %>
+    <style>
+        .textarea{
+            max-height: 10em;
+            resize: none; 
+        }
+    </style>
 </head>
 <body>
     <%- include('../template/navbar') %>
     <div class="container mt-5">
-        <% if(admin_name) { %> 
+        <% if(admin_name) { %>  
         <div class="row">
             <div class="col-md-3"></div>
             <div class="col-md-6">
-                <h2>新增輪播牆圖片</h2>
+                <h2>新增論文資訊</h2>
                 <% if(errorMessage && errorMessage.length > 0){ %>
                 <div class="alert alert-dismissible alert-danger">
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -19,27 +25,40 @@
                 </div>
                 <% } %>
     
-                <form method="POST" action="/carouselAdd" enctype="multipart/form-data" accept-charset="UTF-8" data-bitwarden-watching="1">    
+                <form method="POST" action="/articleAdd" data-bitwarden-watching="1">    
                     <div class="form-group list">
-                        <label class="form-label"><span class="required">*</span>名稱：</label>
-                        <input name="carousel_title" type="text" class="form-control" placeholder="請輸入圖片名稱">
+                        <label class="form-label">名稱：</label>
+                        <input name="article_title" type="text" class="form-control" placeholder="請輸入論文名稱" required="required">
                     </div>
 
                     <div class="form-group list">
-                        <label for="formFile" class="form-label"><span class="required">*</span>上傳：</label>
-                        <input class="form-control" type="file" id="carousel_path" name="carousel_path">
-                    </div>
-                    <a style="color: rgb(207, 59, 59); padding-left:70px; font-size: small;">＊圖檔檔名建議使用英文，以避免顯示為亂碼。</a>
-                    
-                    
-                    <div class="form-group list">
-                        <label class="form-label">連結：</label>
-                        <input name="carousel_link" type="text" class="form-control" placeholder="請輸入輪播圖的廣告連結">
+                        <label class="form-label">日期：</label>
+                        <input name="article_date" type="date" class="form-control" placeholder="請輸入發表日期" required="required">
                     </div>
 
                     <div class="form-group list">
-                        <label class="form-label"><span class="required">*</span>狀態：</label>
-                        <select class="form-select" name="carousel_publish">
+                        <label class="form-label">作者：</label>
+                        <input name="article_author" type="text" class="form-control" placeholder="請輸入論文作者" required="required">
+                    </div>
+    
+                    <div class="form-group list">
+                        <label class="form-label">期刊：</label>
+                        <input name="article_journal" type="text" class="form-control" placeholder="請輸入期刊名稱" required="required">
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">摘要：</label>
+                        <textarea name="article_abstract" class="form-control textarea" rows="10" placeholder="請輸入論文摘要"></textarea>
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">網址：</label>
+                        <input name="article_link" type="text" class="form-control" placeholder="請輸入論文網址">
+                    </div>
+                    
+                    <div class="form-group list">
+                        <label class="form-label">狀態：</label>
+                        <select class="form-select" name="article_publish">
                             <option value="" disabled selected>請選擇狀態</option>
                             <option value="publish">上架</option>
                             <option value="unpublish">下架</option>
@@ -49,7 +68,7 @@
                     <div class="form-group list mt-4">
                         <input type="submit" class="btn btn-success btn_margin" />
                         <button type="button" class="btn btn-warning btn_margin" id="clearButton">清空</button>
-                        <a class="btn btn-secondary btn_margin" href="/carouselList">取消</a>
+                        <a class="btn btn-secondary btn_margin" href="/eventList">取消</a>
                     </div>
                 </form>
             </div>

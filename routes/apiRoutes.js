@@ -1,22 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const dataRoutes = require('./api/data');
+const carouselRoutes = require('./api/carouselData');
 const productRoutes = require('./api/productData');
-const eventRoutes = require('./api/eventData');
+const articleRoutes = require('./api/articleData');
 const userRoutes = require('./api/userData');
 const favoriteRoutes = require('./api/favoriteData');
-const cartRoutes = require('./api/cartData');
-const recipientRoutes = require('./api/recipientData');
-const orderRoutes = require('./api/orderData');
 
-
-router.use('/api/data', dataRoutes);
+router.use('/api/carouselData', carouselRoutes);
 router.use('/api/productData', productRoutes);
-router.use('/api/eventData', eventRoutes);
+router.use('/api/articleData', articleRoutes);
 router.use('/api/userData', userRoutes);
 router.use('/api/favoriteData', favoriteRoutes);
-router.use('/api/cartData', cartRoutes);
-router.use('/api/recipientData', recipientRoutes);
-router.use('/api/orderData', orderRoutes);
 
 module.exports = router;

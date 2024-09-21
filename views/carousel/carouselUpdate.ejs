@@ -31,16 +31,17 @@
                 <form method="POST" action="/update_carousel/<%= carousel.carousel_id %>" enctype="multipart/form-data" data-bitwarden-watching="1">  
 
                     <div class="form-group list">
-                        <label class="form-label">名稱：</label>
+                        <label class="form-label"><span class="required">*</span>名稱：</label>
                         <input name="carousel_title" type="text" class="form-control"  value="<%= carousel.carousel_title %>" placeholder="請輸入圖片名稱" required="required">
                     </div>
                     <div class="form-group list">
                         <label class="form-label">檔名：</label>
                         <p class="form-control"><%- carousel.carousel_path %></p>
                     </div>
+                    <a style="color: rgb(207, 59, 59); padding-left:70px; font-size: small;">＊檔名建議使用英文，以避免顯示為亂碼。</a>
 
                     <div class="form-group list">
-                        <label class="form-label">原圖：</label>
+                        <label class="form-label"><span class="required">*</span>原圖：</label>
                         <div class="form-control">
                             <img class="img-fluid" src="../../uploads/<%= carousel.carousel_path %>" alt="Carousel Image">
                         </div>
@@ -56,10 +57,14 @@
                         <label class="form-label" id="uploadLabel"style="display: none;">新圖：</label>
                         <input type="text" name="carousel_path" value="<%- carousel.carousel_path %>" hidden>
                     </div>
-                    
+
+                    <div class="form-group list">
+                        <label class="form-label">連結：</label>
+                        <input name="carousel_link" type="text" class="form-control"  value="<%= carousel.carousel_link %>" placeholder="請輸入輪播圖的廣告連結" required="required">
+                    </div>
                     
                     <div class="form-group list">
-                        <label class="form-label">狀態：</label>
+                        <label class="form-label"><span class="required">*</span>狀態：</label>
                         <select class="form-select" name="carousel_publish">
                             <option value="" disabled>請選擇狀態</option>
                             <option value="publish" <% if (carousel.carousel_publish === 'publish') { %>selected<% } %>>上架</option>
@@ -68,8 +73,8 @@
                     </div>
                     
                     <div class="form-group list mt-4">
-                        <input type="submit" class="btn btn-success" />                        
-                        <a class="btn btn-secondary" href="/carouselList">返回</a>
+                        <input type="submit" class="btn btn-success btn_margin" onclick="return confirm('確認更新資料？');"/>                        
+                        <a class="btn btn-secondary btn_margin" href="/carouselList">取消</a>
                     </div>
                 </form>
             </div>
@@ -77,7 +82,7 @@
         </div>
         <% } else { %>
             <div class="loginContainer">
-                <p class="loginText">歡迎使用中日同形詞管理系統</p>
+                <p class="loginText">歡迎使用「記憶術提升漢字詞學習」管理系統</p>
                 <p class="loginText">請系統管理員登入系統</p>  
             </div>
         <% } %>

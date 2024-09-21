@@ -53,6 +53,17 @@ const favoriteController = {
           });
         }
       },
+      checkIfFavorite: async (req, res) => {
+        const { user_id, product_id } = req.params;
+    
+        try {
+          const result = await favoriteModel.checkIfFavorite(user_id, product_id);
+          res.status(200).json({ isFavorite: result.isFavorite });
+        } catch (error) {
+          console.error('Error checking if product is favorite:', error);
+          res.status(500).json({ error: '服务器错误' });
+        }
+      },
 }
 
 module.exports = favoriteController;

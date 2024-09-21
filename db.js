@@ -7,7 +7,8 @@ let connection = mysql.createConnection({
     port: DATABASE_PORT,
     user     : DATABASE_USER,
     password : DATABASE_PASSWORD,
-    database : DATABASE
+    database : DATABASE,
+    charset: 'utf8mb4'
 });
 
 

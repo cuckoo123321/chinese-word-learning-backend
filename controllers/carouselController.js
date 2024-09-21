@@ -2,7 +2,6 @@ const carouselModel = require('../models/carouselModel');
 const multer = require('multer'); // 用於處理上傳的中間件
 const path = require('path');
 const fs = require('fs');
-// const iconv = require('iconv-lite');
 
 const uploadDir = path.join(__dirname, '../uploads');
 
@@ -15,15 +14,17 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {    
-       cb(null, Date.now() + '-' + file.originalname);
+        const originalname = Buffer.from(file.originalname, 'latin1').toString('utf8'); // 處理中文檔名ß
+        cb(null, Date.now() + '-' + originalname);
     }
 });
 
 const upload = multer({ storage });
 
-function updateCarouselInDatabase(carouselID, title, publish, updated_at, newImageFilename) {
+function updateCarouselInDatabase(carouselID, title, link, publish, updated_at, newImageFilename) {
     carouselModel.update(
         title,
+        link,
         updated_at,
         publish,
         carouselID,
@@ -55,7 +56,7 @@ const carouselController = {
                     const filename = req.file.filename;
 
                     // 2. 檢查其他必要欄位
-                    const { carousel_title, carousel_publish } = req.body;
+                    const { carousel_title, carousel_link, carousel_publish } = req.body;
                     if (!carousel_title || !filename || !carousel_publish) {
                         req.flash('errorMessage', '缺少必要欄位');
                         return next();
@@ -65,6 +66,7 @@ const carouselController = {
                     const carousel = {
                         carousel_title,
                         carousel_path: filename,
+                        carousel_link,
                         carousel_publish
                     };
     
@@ -112,126 +114,163 @@ const carouselController = {
             if (err) {
                 console.error('檔案上傳失敗:', err);
                 res.status(500).send('檔案上傳失敗');
-            } else {
-                try {
-                    const carousel_updated_at = new Date();
-                    const { carousel_title, carousel_publish } = req.body;
-                    const carouselID = req.params.id;
-                    const originalPath = req.body.carousel_path;
+                return;
+            }
     
-                    // 檢查是否有新圖片上傳
-                    if (req.file) {
-                        // 如果有新圖片，先刪除舊圖片
-                        carouselModel.getFilePath(carouselID, (filePathErr, filePath) => {
-                            if (filePathErr) {
-                                console.error('Error getting file path:', filePathErr);
-                                res.status(500).send('Error getting file path');
-                                return;
-                            }
+            try {
+                const carousel_updated_at = new Date();
+                const { carousel_title, carousel_link, carousel_publish } = req.body;
+                const carouselID = req.params.id;
+                const originalPath = req.body.carousel_path;
     
-                            // 檢查檔案是否存在
-                            if (fs.existsSync(filePath)) {
-                                // 使用 fs.unlink 刪除舊圖片
-                                fs.unlink(filePath, (unlinkErr) => {
-                                    if (unlinkErr) {
-                                        if (unlinkErr.code === 'ENOENT') {
-                                            console.log('File does not exist');
-                                        } else {
-                                            console.error('Error deleting old file:', unlinkErr);
-                                        }
-                                    }
+                // 檢查是否有新圖片上傳
+                if (req.file) {
+                    // 如果有新圖片，先刪除舊圖片
+                    carouselModel.getFilePath(carouselID, (filePathErr, filePath) => {
+                        if (filePathErr) {
+                            console.error('Error getting file path:', filePathErr);
+                            res.status(500).send('Error getting file path');
+                            return;
+                        }
     
-                                    // 繼續執行資料庫中的更新操作，將新圖片的檔名作為參數傳入
-                                    carouselModel.update(
-                                        carousel_title,
-                                        carousel_updated_at,
-                                        carousel_publish,
-                                        carouselID,
-                                        req.file.filename,
-                                        (updateErr) => {
-                                            if (updateErr) {
-                                                console.error('Error updating carousel:', updateErr);
-                                            } else {
-                                                res.redirect('/carouselList');
-                                            }
-                                        }
-                                    );
-                                });
-                            } else {
-                                console.log('File does not exist');
+                        // 檢查檔案是否存在
+                        if (fs.existsSync(filePath)) {
+                            // 使用 fs.unlink 刪除舊圖片
+                            fs.unlink(filePath, (unlinkErr) => {
+                                if (unlinkErr) {
+                                    console.error('Error deleting old file:', unlinkErr);
+                                    res.status(500).send('Error deleting old file');
+                                    return;
+                                }                        
+    
                                 // 繼續執行資料庫中的更新操作，將新圖片的檔名作為參數傳入
                                 carouselModel.update(
                                     carousel_title,
+                                    carousel_link,
                                     carousel_updated_at,
                                     carousel_publish,
                                     carouselID,
-                                    req.file.filename,
+                                    req.file.filename, // 新圖片的檔名
                                     (updateErr) => {
                                         if (updateErr) {
                                             console.error('Error updating carousel:', updateErr);
+                                            res.status(500).send('Error updating carousel');
                                         } else {
                                             res.redirect('/carouselList');
                                         }
                                     }
                                 );
-                            }
-                        });
-                    } else {
-                        // 沒有新圖片上傳，還是要傳遞原本的圖片的檔名
-                        carouselModel.update(
-                            carousel_title,
-                            carousel_updated_at,
-                            carousel_publish,
-                            carouselID,
-                            originalPath,
-                            (updateErr) => {
-                                if (updateErr) {
-                                    console.error('Error updating carousel:', updateErr);
-                                } else {
-                                    res.redirect('/carouselList');
+                            });
+                        } else {
+                            // 繼續執行資料庫中的更新操作，將新圖片的檔名作為參數傳入
+                            carouselModel.update(
+                                carousel_title,
+                                carousel_link,
+                                carousel_updated_at,
+                                carousel_publish,
+                                carouselID,
+                                req.file.filename, // 新圖片的檔名
+                                (updateErr) => {
+                                    if (updateErr) {
+                                        console.error('Error updating carousel:', updateErr);
+                                        res.status(500).send('Error updating carousel');
+                                    } else {
+                                        res.redirect('/carouselList');
+                                    }
                                 }
+                            );
+                        }
+                    });
+                } else {
+                    // 沒有新圖片上傳，還是要傳遞原本的圖片的檔名
+                    carouselModel.update(
+                        carousel_title,
+                        carousel_link,
+                        carousel_updated_at,
+                        carousel_publish,
+                        carouselID,
+                        originalPath, // 保持原圖片的檔名
+                        (updateErr) => {
+                            if (updateErr) {
+                                console.error('Error updating carousel:', updateErr);
+                                res.status(500).send('Error updating carousel');
+                            } else {
+                                res.redirect('/carouselList');
                             }
-                        );
-                    }
-                } catch (dbError) {
-                    console.error('資料庫操作失敗:', dbError);
-                    req.flash('errorMessage', dbError.toString());
-                    return next();
+                        }
+                    );
                 }
+            } catch (dbError) {
+                console.error('資料庫操作失敗:', dbError);
+                req.flash('errorMessage', dbError.toString());
+                return next();
+            }
+        });
+    },
+    
+    
+
+    delete: (req, res) => {
+        const carouselID = req.params.id;
+    
+        // 先取得要刪除的檔案路徑
+        carouselModel.getFilePath(carouselID, (filePathErr, filePath) => {
+            if (filePathErr) {
+                console.error('Error getting file path:', filePathErr);
+                res.status(500).send('Error getting file path');
+                return;
+            }
+    
+            // 檢查檔案是否存在
+            if (fs.existsSync(filePath)) {
+                // 使用 fs.unlink 刪除檔案
+                fs.unlink(filePath, (unlinkErr) => {
+                    if (unlinkErr) {
+                        console.error('Error deleting file:', unlinkErr);
+                        // 可以考慮返回錯誤訊息或進行其他處理
+                        res.status(500).send('Error deleting file');
+                        return;
+                    }
+
+                    // 繼續執行資料庫中的刪除操作
+                    carouselModel.delete(carouselID, (deleteErr) => {
+                        if (deleteErr) {
+                            console.error('Error deleting carousel:', deleteErr);
+                            // 可以考慮返回錯誤訊息或進行其他處理
+                            res.status(500).send('Error deleting carousel');
+                        } else {
+                            res.redirect('/carouselList');
+                        }
+                    });
+                });
+            } else {
+                console.log('File does not exist');
+    
+                // 即使檔案不存在，仍然執行資料庫中的刪除操作
+                carouselModel.delete(carouselID, (deleteErr) => {
+                    if (deleteErr) {
+                        console.error('Error deleting carousel:', deleteErr);
+                        res.status(500).send('Error deleting carousel');
+                    } else {
+                        res.redirect('/carouselList');
+                    }
+                });
             }
         });
     },
     
 
-    delete: (req, res) => {
-        const carouselID = req.params.id;
-      
-        // 先取得要刪除的檔案路徑
-        carouselModel.getFilePath(carouselID, (filePathErr, filePath) => {
-          if (filePathErr) {
-            console.error('Error getting file path:', filePathErr);
-            res.status(500).send('Error getting file path');
-            return;
-          }
-      
-          // 使用 fs.unlink 刪除檔案
-          fs.unlink(filePath, (unlinkErr) => {
-            if (unlinkErr) {
-              if (unlinkErr.code === 'ENOENT') {
-                console.log('File does not exist');
-              } else {
-                console.error('Error deleting file:', unlinkErr);
-              }
-            } 
-      
-            // 繼續執行資料庫中的刪除操作
-            carouselModel.delete(carouselID, (deleteErr) => {
-              if (deleteErr) {
-                console.error('Error deleting carousel:', deleteErr);
-              }
-              res.redirect('/carouselList');
+    search: (req, res) => {
+        const keyword = req.query.keyword;
+        carouselModel.search(keyword, (err, results) => {
+            if (err) {
+                console.log('Error:', err);
+                return res.status(500).send('搜尋失敗');
+            }
+            res.render('carousel/carouselList', {
+                carousel: results,
+                carousel_title: req.session.carousel_title
             });
-          });
         });
     },
 

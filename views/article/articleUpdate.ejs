@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../template/head') %>
+    <%- include('../../css/addUpdateStyle') %>
+</head>
+<body>
+    <%- include('../template/navbar') %>
+    <div class="container mt-5">
+        <% if(admin_name) { %>  
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <h2>編輯文章資訊</h2>
+                <% if(errorMessage && errorMessage.length > 0){ %>
+                    <div class="alert alert-dismissible alert-danger">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <strong><%= errorMessage %></strong>
+                    </div>
+                <% } %>
+
+                <form method="POST" action="/update_article/<%= article.article_id %>" data-bitwarden-watching="1">
+
+                    <div class="form-group list">
+                        <label class="form-label">名稱：</label>
+                        <input name="article_title" type="text" class="form-control" value="<%= article.article_title %>" placeholder="請輸入論文名稱" required="required">
+                    </div>
+
+                    <%
+                    const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                    const formattedDate = new Date(article.article_date).toLocaleDateString('zh-TW', dateOptions).replaceAll('/', '-');
+                    %>
+
+
+                    <div class="form-group list">
+                        <label class="form-label">日期：</label>
+                        <% if (article.article_date) { %>
+                        <input name="article_date" type="date" class="form-control" value="<%= formattedDate %>" >
+                        <% } else { %>
+                            <input name="article_date" type="date" class="form-control">
+                        <% } %>
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">作者：</label>
+                        <input name="article_author" type="text" class="form-control" value="<%= article.article_author %>" placeholder="請輸入活動地點" required="required">
+                    </div>
+    
+                    <div class="form-group list">
+                        <label class="form-label">期刊：</label>
+                        <input name="article_journal" type="text" class="form-control" value="<%= article.article_journal %>" placeholder="請輸入期刊名稱" required="required">
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">摘要：</label>
+                        <textarea name="article_abstract" class="form-control textarea" rows="10" placeholder="請輸入論文摘要"><%= article.article_abstract %></textarea>
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">網址：</label>
+                        <input name="article_link" type="text" class="form-control" value="<%= article.article_link %>" placeholder="請輸入論文網址">
+                    </div>
+                    
+                    <div class="form-group list">
+                        <label class="form-label">狀態：</label>
+                        <select class="form-select" name="article_publish">
+                            <option value="" disabled>請選擇狀態</option>
+                            <option value="publish" <% if (article.article_publish === 'publish') { %>selected<% } %>>上架</option>
+                            <option value="unpublish" <% if (article.article_publish === 'unpublish') { %>selected<% } %>>下架</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group list mt-4">
+                        <input type="submit" class="btn btn-success btn_margin" onclick="return confirm('確認更新資料？');"/>
+                        <button type="button" class="btn btn-warning btn_margin" id="clearButton">清空</button>
+                        <a class="btn btn-secondary btn_margin" href="/articleList">取消</a>
+                    </div>
+                </form>
+            </div>
+        <div class="col-md-3"></div>
+    </div>
+    <% } else { %>
+        <div class="loginContainer">
+            <p class="loginText">歡迎使用「記憶術提升漢字詞學習」管理系統</p>
+            <p class="loginText">請系統管理員登入系統</p>  
+        </div>
+    <% } %>    
+    </div>
+
+    <script>
+        let errorMessages = [];
+
+        // 檢查否存在實際錯誤
+        function hasErrors(errorMessages) {
+            return errorMessages.filter(function() {
+                return $(this).text().trim().length > 0;
+            }).length > 0;
+        }
+
+        //清空欄位
+        $(document).ready(function(){
+            $('#clearButton').click(function(){
+                $('form').find(':input').not(':button, :submit, :reset, :hidden').val('').prop('checked', false);
+            })
+        })
+    </script>
+</body>
+</html>

@@ -20,7 +20,7 @@
         <div class="row">
             <div class="col-md-3"></div>
             <div class="col-md-6">
-                <h2>編輯商品</h2>
+                <h2>編輯出版產品</h2>
                 <% if(errorMessage && errorMessage.length > 0){ %>
                 <div class="alert alert-dismissible alert-danger">
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -31,19 +31,67 @@
                 <form method="POST" action="/update_product/<%= product.product_id %>" enctype="multipart/form-data" data-bitwarden-watching="1">  
                     
                     <div class="form-group list">
-                        <label class="form-label">編號：</label>
-                        <input name="product_number" type="text" class="form-control" placeholder="請輸入商品編號" value="<%= product.product_number %>" >
+                        <label class="form-label"><span class="required">*</span>編碼：</label>
+                        <input name="product_number" type="text" class="form-control" placeholder="請輸入產品編碼" value="<%= product.product_number %>" >
                     </div>
 
                     <div class="form-group list">
-                        <label class="form-label">名稱：</label>
-                        <input name="product_title" type="text" class="form-control" placeholder="請輸入商品名稱" value="<%= product.product_title %>">
+                        <label class="form-label"><span class="required">*</span>排序：</label>
+                        <input name="product_rank" type="text" class="form-control" placeholder="請輸入產品於網站顯示的順序（如：1）" value="<%= product.product_rank %>">
                     </div>
+
+                    <div class="form-group list">
+                        <label class="form-label"><span class="required">*</span>名稱：</label>
+                        <input name="product_title" type="text" class="form-control" placeholder="請輸入產品名稱" value="<%= product.product_title %>">
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">譯名：</label>
+                        <input name="product_translation" type="text" class="form-control" placeholder="請輸入產品譯名" value="<%= product.product_translation %>">
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label"><span class="required">*</span>分類：</label>
+                        <input name="product_category" type="text" class="form-control" placeholder="請輸入產品分類" value="<%= product.product_category %>">
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">作者：</label>
+                        <input name="product_author" type="text" class="form-control" placeholder="請輸入作者" value="<%= product.product_author %>">
+                    </div>
+
+                    <div class="form-group list">
+                        <label class="form-label">出版：</label>
+                        <input name="product_publisher" type="text" class="form-control" placeholder="請輸入出版社" value="<%= product.product_publisher %>">
+                    </div>
+
+                    <%
+                    const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                    const formattedDate = new Date(product.product_date).toLocaleDateString('zh-TW', dateOptions).replaceAll('/', '-');
+                    %>
+
+                    <div class="form-group list">
+                        <label class="form-label"><span class="required">*</span>日期：</label>
+                        <input name="product_date" type="date" class="form-control" placeholder="請輸入出版日期" value="<%= product.product_date ? formattedDate : '' %>">
+                    </div> 
+
+                    <div class="form-group list">
+                        <label class="form-label">簡介：</label>
+                        <textarea name="product_description" class="form-control" placeholder="請輸入產品簡介" rows="4" style="width: 100%; resize: vertical;"><%= product.product_description %></textarea>
+                    </div>
+                    <a style="color: rgb(207, 59, 59); padding-left:70px; font-size: small;">＊建議至前台查看文字長度與圖片比例是否合適，避免文字過長導致圖片被縮小。</a>
+
+                    <div class="form-group list">
+                        <label class="form-label">譯文：</label>
+                        <textarea name="product_description_foreign" class="form-control" placeholder="請輸入產品外文簡介" rows="4" style="width: 100%; resize: vertical;"><%= product.product_description_foreign %></textarea>
+                    </div>
+                    
 
                     <div class="form-group list">
                         <label class="form-label">檔名：</label>
-                        <p class="form-control"><%- product.product_path %></p>
+                        <p class="form-control" readonly><%- product.product_path %></p>
                     </div>
+                    <a style="color: rgb(207, 59, 59); padding-left:70px; font-size: small;">＊檔名建議使用英文，以避免顯示為亂碼。</a>
 
                     <div class="form-group list">
                         <label class="form-label">原圖：</label>
@@ -64,32 +112,12 @@
                     </div>
 
                     <div class="form-group list">
-                        <label class="form-label">定價：</label>
-                        <input name="product_price" type="text" class="form-control" placeholder="請輸入商品定價" value="<%= product.product_price %>">
-                    </div>
-
-                    <div class="form-group list">
-                        <label class="form-label">特價：</label>
-                        <input name="product_discount" type="text" class="form-control" placeholder="請輸入商品特價" value="<%= product.product_discount %>">
-                    </div>
-
-                    <div class="form-group list">
-                        <label class="form-label">簡介：</label>
-                        <input name="product_description" type="text" class="form-control" placeholder="請輸入商品簡介" value="<%= product.product_description %>">
+                        <label class="form-label"><span class="required">*</span>連結：</label>
+                        <input name="product_link" type="text" class="form-control" placeholder="請輸入產品購買連結" value="<%= product.product_link %>">
                     </div>
                     
                     <div class="form-group list">
-                        <label class="form-label">分類：</label>
-                        <input name="product_category" type="text" class="form-control" placeholder="請輸入商品分類" value="<%= product.product_category %>">
-                    </div>
-
-                    <div class="form-group list">
-                        <label class="form-label">庫存：</label>
-                        <input name="product_stock" type="text" class="form-control" placeholder="請輸入商品庫存" value="<%= product.product_stock %>">
-                    </div>
-                    
-                    <div class="form-group list">
-                        <label class="form-label">狀態：</label>
+                        <label class="form-label"><span class="required">*</span>狀態：</label>
                         <select class="form-select" name="product_publish">
                             <option value="" disabled>請選擇狀態</option>
                             <option value="publish" <% if (product.product_publish === 'publish') { %>selected<% } %>>上架</option>
@@ -98,9 +126,9 @@
                     </div>
                     
                     <div class="form-group list mt-4">
-                        <input type="submit" class="btn btn-success" />
-                        <button type="button" class="btn btn-warning" id="clearButton">清空</button>
-                        <a class="btn btn-secondary" href="/productList">返回</a>
+                        <input type="submit" class="btn btn-success btn_margin" onclick="return confirm('確認更新資料？');"/>
+                        <button type="button" class="btn btn-warning btn_margin" id="clearButton">清空</button>
+                        <a class="btn btn-secondary btn_margin" href="/productList">取消</a>
                     </div>
                 </form>
             </div>
@@ -108,7 +136,7 @@
         </div>
         <% } else { %>
             <div class="loginContainer">
-                <p class="loginText">歡迎使用中日同形詞管理系統</p>
+                <p class="loginText">歡迎使用「記憶術提升漢字詞學習」管理系統</p>
                 <p class="loginText">請系統管理員登入系統</p>  
             </div>
             
@@ -180,50 +208,6 @@
     }
 
 
-        // //把資料存進 localStorage
-        // $(document).ready(function(){
-        //     const formData = JSON.parse(localStorage.getItem('formData')) || {};
-        //     //把儲存的資料填進表單，但要排除密碼
-        //     for(const key in formData){
-        //         if(formData.hasOwnProperty(key) && key !== 'user_password'){
-        //             if(key === 'user_gender'){
-        //                 $(`[name="${key}"][value="${formData[key]}"]`).prop('checked', true);
-        //             }else{
-        //                 $(`[name="${key}"]`).val(formData[key]);
-        //             }                    
-        //         }
-        //     }
-        //     //把 input 資料存進 localStorage，但要排除密碼
-        //     $('form :input').on('input', function(){
-        //         if(this.name !== 'user_password'){
-        //             // if(this.name === 'user_gender'){
-        //             //     formData[this.name] = $('input[name="admin_disabled"]:checked').val();
-        //             // }else{
-        //             //     formData[this.name] = $(this).val();
-        //             // }
-        //             localStorage.setItem('formData', JSON.stringify(formData));
-        //         } 
-        //     });
-
-        //     //按提交表單或取消返回上頁時，清空 localStorage
-        //     $('form').submit(function(){
-        //         //檢查是否有錯誤訊息
-        //         if (errorMessages.length === 0 || !hasErrors(errorMessages)) {
-        //         // 如果沒有錯誤訊息、實際錯誤，清空 localStorage
-        //         localStorage.removeItem('formData');
-        //         }               
-        //     })
-        //     $('#clearButton').click(function(){
-        //         localStorage.removeItem('formData');
-        //     })
-        // })
-
-        // // 檢查否存在實際錯誤
-        // function hasErrors(errorMessages) {
-        //     return errorMessages.filter(function() {
-        //         return $(this).text().trim().length > 0;
-        //     }).length > 0;
-        // }
     </script>
 </body>
 </html>

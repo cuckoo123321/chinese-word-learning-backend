@@ -9,16 +9,16 @@
 
     <div class="container mt-5">
         <div class="row">
-            <% if(admin_name) { %>  
+            <% if(admin_name) {  %>  
             <div class="col-md-3 d-flex">
-                <a class="btn btn-primary mb-2 add" href="/add">新增管理員</a>
-                <a class="btn btn-primary mb-2" href="/list">顯示所有列表</a>
+                <a class="btn btn-primary mb-2 add" href="/adminAdd">新增管理員</a>
+                <a class="btn btn-primary mb-2" href="/adminList">顯示所有列表</a>
             </div>
         
             <div class="col-md-9">
                 <form class="mb-3" role="search" method="GET" action="/search">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="請輸入姓名、帳號、信箱關鍵字" aria-label="Search" name="keyword">
+                        <input type="text" class="form-control" placeholder="請輸入姓名／帳號／信箱關鍵字" aria-label="Search" name="keyword">
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="submit" id="button-addon2">查詢</button>
                         </div>
@@ -26,6 +26,13 @@
                 </form>
             </div>
         </div>
+
+        <% if(errorMessage && errorMessage.length > 0){ %>
+            <div class="alert alert-dismissible alert-danger">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <strong><%= errorMessage %></strong>
+            </div>
+        <% } %>
         
         
 
@@ -91,7 +98,9 @@
                 </div>
               </th>
               <th></th>
+              <% if (admin_permission_level === 'Super') { %> 
               <th></th>
+              <% } %>
             </tr>
         </thead>
         <tbody>
@@ -121,27 +130,20 @@
                                       
                     <td>
                         <a class="btn btn-outline-info" href="/update_admin/<%= admin.admin_id %>">編輯</a>
-                    </td>  
+                    </td> 
+                    <% if (admin_permission_level === 'Super') { %> 
                     <td>
                         <a class="btn btn-outline-danger" href="/delete_admin/<%= admin.admin_id %>" onclick="return confirmDelete();">刪除</a>
-                   </td>   
+                   </td> 
+                   <% } %>  
                 </tr>
             <% }); %>
           </tbody>
     </table>
-    <!-- 分頁 -->
-    <div>
-        <ul class="pagination">
-          <% for(let i = 1; i <= totalPages; i++) { %>
-            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                <a class="page-link" href="/admin/list?page=<%= i %>"><%= i %></a>
-            </li>
-          <% } %>
-        </ul>
-      </div>
+    
       <% } else { %>
         <div class="loginContainer">
-            <p class="loginText">歡迎使用中日同形詞管理系統</p>
+            <p class="loginText">歡迎使用「記憶術提升漢字詞學習」管理系統</p>
             <p class="loginText">請系統管理員登入系統</p>  
         </div>
       <% } %> 

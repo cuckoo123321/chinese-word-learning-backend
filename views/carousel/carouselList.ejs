@@ -8,10 +8,10 @@
             font-size: smaller;
         }
         img {
-            max-width: 100px; /* 最大寬度 */
-            max-height: 100px; /* 最大高度 */
-            width: auto; /* 自動調整寬度 */
-            height: auto; /* 自動調整高度 */
+            max-width: 100px;
+            max-height: 100px;
+            width: auto; 
+            height: auto;
         }
     </style>
 </head>
@@ -27,9 +27,9 @@
             </div>
         
             <div class="col-md-9">
-                <form class="mb-3" role="search" method="GET" action="/search">
+                <form class="mb-3" role="search" method="GET" action="/carouselSearch">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="請輸入關鍵字" aria-label="Search" name="keyword">
+                        <input type="text" class="form-control" placeholder="請輸入名稱／檔名" aria-label="Search" name="keyword">
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="submit" id="button-addon2">查詢</button>
                         </div>
@@ -47,33 +47,20 @@
               <th>名稱</th>
               <th>檔名</th>
               <th>預覽</th>                
-              <th>           
+              <th>
                 <!-- 狀態下拉選單 -->
                 <div class="dropdown">
                     <button class="dropdown-toggle" type="button" id="publishDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         狀態
                     </button>
                     <div class="dropdown-menu" aria-labelledby="publishDropdown">
-                        <a class="dropdown-item publish" href="#" data-permission="all">全部</a>
-                        <a class="dropdown-item publish" href="#" data-permission="publish">上架</a>
-                        <a class="dropdown-item publish" href="#" data-permission="unpublish">下架</a>                       
+                        <a class="dropdown-item status" href="#" data-status="all">全部</a>
+                        <a class="dropdown-item status" href="#" data-status="publish">上架</a>
+                        <a class="dropdown-item status" href="#" data-status="unpublish">下架</a>                       
                     </div>
                 </div>
               </th>
-              <th>                
-                <!-- 更新時間下拉選單 -->
-                <div class="dropdown">
-                    <button class="dropdown-toggle" type="button" id="updatedAtDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        更新時間
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="updatedAtDropdown">
-                        <a class="dropdown-item updatedAt" href="#" data-status="all">全部</a>
-                        <a class="dropdown-item updatedAt" href="#" data-status="week">近一週</a>
-                        <a class="dropdown-item updatedAt" href="#" data-status="month">近一個月</a>
-                        <a class="dropdown-item updatedAt" href="#" data-status="year">近一年</a>
-                    </div>
-                </div>
-              </th>              
+              <th>更新時間</th>              
               <th></th>
               <th></th>              
             </tr>
@@ -92,7 +79,9 @@
                     <td>
                         <img src="../../uploads/<%= carousel.carousel_path %>" alt="Carousel Image">
                     </td>
-                    <td><%= carousel.carousel_publish === 'publish' ? '上架' : '下架' %></td>
+                    <td style="color: <%= carousel.carousel_publish === 'publish' ? 'green' : 'gray' %>;">
+                        <%= carousel.carousel_publish === 'publish' ? '上架' : '下架' %>
+                    </td>
                     
                     <% let options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }; %>
                     <% let UpdatedDate = carousel.carousel_updated_at; %>                    
@@ -112,7 +101,7 @@
     </table>
     <% } else { %>
         <div class="loginContainer">
-            <p class="loginText">歡迎使用中日同形詞管理系統</p>
+            <p class="loginText">歡迎使用「記憶術提升漢字詞學習」管理系統</p>
             <p class="loginText">請系統管理員登入系統</p>  
         </div>
       <% } %>  
@@ -124,74 +113,29 @@
             return confirm('確定要刪除此圖片嗎？');
         }
 
-        // 權限篩選
-        $('.dropdown-item.permission').click(function(){
-            const selectedPermission = $(this).data('permission');
-            applyFilters(selectedPermission);
-        });
-
+        // 狀態篩選
+        $(document).ready(function() {
         // 狀態篩選
         $('.dropdown-item.status').click(function(){
             const selectedStatus = $(this).data('status');
             applyFilters(selectedStatus);
         });
 
-        function applyFilters(selectedValue) {
-            // 先隱藏所有行
-            $('table tbody tr').hide();
+            function applyFilters(selectedValue) {
+                // 先隱藏所有行
+                $('table tbody tr').hide();
 
-            if (selectedValue === 'all') {
-                // 顯示所有行
-                $('table tbody tr').show();
-            } else {
-                // 顯示符合篩選條件的行
-                $(`table tbody tr td:contains("${selectedValue}")`).parent().show();
-            }
-        }
-
-        // 創建時間篩選
-        $('.createdAt').click(function () {
-            const selectedStatus = $(this).data('status');
-            handleDateFilter(selectedStatus);
-            
-        });
-
-        // 更新時間篩選
-        $('.updatedAt').click(function () {
-            const selectedStatus = $(this).data('status');
-            handleDateFilter(selectedStatus);
-            
-        });
-
-        function handleDateFilter(selectedStatus){
-            // 隱藏或顯示符合篩選的行
-            if (selectedStatus === 'all') {
-                $('.dateRow').show(); // 顯示所有行
-            } else {
-                $('.dateRow').hide(); // 隱藏所有行
-                const cutoffDate = new Date();
-
-                // 根據所選擇的篩選條件計算截止日期
-                switch (selectedStatus) {
-                    case 'week':
-                        cutoffDate.setDate(cutoffDate.getDate() - 7);
-                        break;
-                    case 'month':
-                        cutoffDate.setMonth(cutoffDate.getMonth() - 1);
-                        break;
-                    case 'year':
-                        cutoffDate.setFullYear(cutoffDate.getFullYear() - 1);
-                        break;
+                if (selectedValue === 'all') {
+                    // 顯示所有行
+                    $('table tbody tr').show();
+                } else {
+                    // 顯示符合篩選條件的行
+                    $('table tbody tr').filter(function() {
+                        return $(this).find('td').text().indexOf(selectedValue === 'publish' ? '上架' : '下架') !== -1;
+                    }).show();
                 }
-
-                // 顯示符合篩選條件的行
-                $('.dateRow').filter(function () {
-                    const createdAt = new Date($(this).data('created-at'));
-                    const updatedAt = new Date($(this).data('updated-at'));
-                    return createdAt >= cutoffDate || updatedAt >= cutoffDate;
-                }).show();
-            }
-        }
+            } 
+        });
     </script>
 </body>
 </html>
