@@ -19,7 +19,7 @@
                 </div>
                 <% } %>
     
-                <form method="POST" action="/userAdd" data-bitwarden-watching="1">    
+                <form method="POST" action="<%= baseUrl %>/userAdd" data-bitwarden-watching="1">    
                     <div class="form-group list">
                         <label class="form-label">帳號：</label>
                         <input name="user_name" type="text" class="form-control" placeholder="請輸入會員帳號" required="required">
@@ -48,7 +48,7 @@
     
                     <div class="form-group list mt-4">
                         <input type="submit" class="btn btn-success btn_margin" />
-                        <a class="btn btn-secondary btn_margin" href="/userList">取消</a>
+                        <a class="btn btn-secondary btn_margin" href="<%= baseUrl %>/userList">取消</a>
                     </div>
                 </form>
             </div>

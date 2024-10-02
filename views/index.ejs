@@ -57,11 +57,11 @@
         <% if(admin_name) { %>            
             <div><p>歡迎 <%= admin_full_name %> 使用本管理系統</p> </div>
             <div class="btn-container">
-                <a class="btn btn-primary" href="/adminList">系統管理</a>
-                <a class="btn btn-primary" href="/carouselList">首頁輪播</a>  
-                <a class="btn btn-primary" href="/articleList">學術成果</a>              
-                <a class="btn btn-primary" href="/productList">出版產品</a>                
-                <a class="btn btn-primary" href="/userList">網站會員</a>
+                <a class="btn btn-primary" href="<%= baseUrl %>/adminList">系統管理</a>
+                <a class="btn btn-primary" href="<%= baseUrl %>/carouselList">首頁輪播</a>  
+                <a class="btn btn-primary" href="<%= baseUrl %>/articleList">學術成果</a>              
+                <a class="btn btn-primary" href="<%= baseUrl %>/productList">出版產品</a>                
+                <a class="btn btn-primary" href="<%= baseUrl %>/userList">網站會員</a>
             </div>
         <% } else { %>
             <p>歡迎使用「記憶術提升漢字詞學習」管理系統</p>

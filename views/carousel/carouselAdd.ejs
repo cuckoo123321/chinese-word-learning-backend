@@ -19,7 +19,7 @@
                 </div>
                 <% } %>
     
-                <form method="POST" action="/carouselAdd" enctype="multipart/form-data" accept-charset="UTF-8" data-bitwarden-watching="1">    
+                <form method="POST" action="<%= baseUrl %>/carouselAdd" enctype="multipart/form-data" accept-charset="UTF-8" data-bitwarden-watching="1">    
                     <div class="form-group list">
                         <label class="form-label"><span class="required">*</span>名稱：</label>
                         <input name="carousel_title" type="text" class="form-control" placeholder="請輸入圖片名稱">
@@ -49,7 +49,7 @@
                     <div class="form-group list mt-4">
                         <input type="submit" class="btn btn-success btn_margin" />
                         <button type="button" class="btn btn-warning btn_margin" id="clearButton">清空</button>
-                        <a class="btn btn-secondary btn_margin" href="/carouselList">取消</a>
+                        <a class="btn btn-secondary btn_margin" href="<%= baseUrl %>/carouselList">取消</a>
                     </div>
                 </form>
             </div>

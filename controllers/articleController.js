@@ -1,4 +1,6 @@
 const articleModel = require('../models/articleModel');
+require('dotenv').config(); 
+const baseUrl = process.env.BASE_URL || '/CKIS_API'; 
 
 const articleController = {
     add: (req, res) => {
@@ -24,7 +26,7 @@ const articleController = {
                 req.flash('errorMessage', err.toString());
                 return next();
             }
-            res.redirect('/articleList');
+            res.redirect(`${baseUrl}/articleList`);
         });
     },
 
@@ -65,7 +67,7 @@ const articleController = {
                 if (err) {
                     console.error('Error:', err);
                 } else {
-                    res.redirect('/articleList');
+                    res.redirect(`${baseUrl}/articleList`);
                 }
             }
         )
@@ -76,7 +78,7 @@ const articleController = {
             if (err) {
                 console.error('Error deleting article:', err);
             } 
-            res.redirect('/articleList');
+            res.redirect(`${baseUrl}/articleList`);
         })
     },
 

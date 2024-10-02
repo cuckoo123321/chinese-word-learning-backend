@@ -28,7 +28,7 @@
                 </div>
                 <% } %>
     
-                <form method="POST" action="/update_carousel/<%= carousel.carousel_id %>" enctype="multipart/form-data" data-bitwarden-watching="1">  
+                <form method="POST" action="<%= baseUrl %>/update_carousel/<%= carousel.carousel_id %>" enctype="multipart/form-data" data-bitwarden-watching="1">  
 
                     <div class="form-group list">
                         <label class="form-label"><span class="required">*</span>名稱：</label>
@@ -74,7 +74,7 @@
                     
                     <div class="form-group list mt-4">
                         <input type="submit" class="btn btn-success btn_margin" onclick="return confirm('確認更新資料？');"/>                        
-                        <a class="btn btn-secondary btn_margin" href="/carouselList">取消</a>
+                        <a class="btn btn-secondary btn_margin" href="<%= baseUrl %>/carouselList">取消</a>
                     </div>
                 </form>
             </div>

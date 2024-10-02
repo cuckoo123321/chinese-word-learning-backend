@@ -1,8 +1,10 @@
 const productModel = require('../models/productModel');
+require('dotenv').config(); 
+const baseUrl = process.env.BASE_URL || '/CKIS_API'; 
 const multer = require('multer'); // 用於處理上傳的中間件
 const path = require('path');
 const fs = require('fs');
-// const iconv = require('iconv-lite');
+
 
 const uploadDir = path.join(__dirname, '../uploads');
 
@@ -72,7 +74,7 @@ const productController = {
                             req.flash('errorMessage', addErr.toString());
                             return next();
                         }    
-                        res.redirect('/productList');
+                        res.redirect(`${baseUrl}/productList`);
                     });
                 } catch (dbError) {
                     console.error('資料庫操作失敗:', dbError);
@@ -127,7 +129,7 @@ const productController = {
                             console.error('Error deleting product:', deleteErr);
                             res.status(500).send('Error deleting product');
                         } else {
-                            res.redirect('/productList');
+                            res.redirect(`${baseUrl}/productList`);
                         }
                     });
                 });
@@ -140,7 +142,7 @@ const productController = {
                         console.error('Error deleting product:', deleteErr);
                         res.status(500).send('Error deleting product');
                     } else {
-                        res.redirect('/productList');
+                        res.redirect(`${baseUrl}/productList`);
                     }
                 });
             }
@@ -223,7 +225,7 @@ const productController = {
                                             console.error('Error updating product:', updateErr);
                                             res.status(500).send('Error updating product');
                                         } else {
-                                            res.redirect('/productList');
+                                            res.redirect(`${baseUrl}/productList`);
                                         }
                                     }
                                 );
@@ -251,7 +253,7 @@ const productController = {
                                         console.error('Error updating product:', updateErr);
                                         res.status(500).send('Error updating product');
                                     } else {
-                                        res.redirect('/productList');
+                                        res.redirect(`${baseUrl}/productList`);
                                     }
                                 }
                             );
@@ -280,7 +282,7 @@ const productController = {
                                 console.error('Error updating product:', updateErr);
                                 res.status(500).send('Error updating product');
                             } else {
-                                res.redirect('/productList');
+                                res.redirect(`${baseUrl}/productList`);
                             }
                         }
                     );

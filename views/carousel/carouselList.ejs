@@ -22,12 +22,12 @@
         <% if(admin_name) { %> 
         <div class="row">
             <div class="col-md-3 d-flex">
-                <a class="btn btn-primary mb-2 add" href="/carouselAdd">上傳圖片</a>
-                <a class="btn btn-primary mb-2" href="/carouselList">顯示所有列表</a>
+                <a class="btn btn-primary mb-2 add" href="<%= baseUrl %>/carouselAdd">上傳圖片</a>
+                <a class="btn btn-primary mb-2" href="<%= baseUrl %>/carouselList">顯示所有列表</a>
             </div>
         
             <div class="col-md-9">
-                <form class="mb-3" role="search" method="GET" action="/carouselSearch">
+                <form class="mb-3" role="search" method="GET" action="<%= baseUrl %>/carouselSearch">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="請輸入名稱／檔名" aria-label="Search" name="keyword">
                         <div class="input-group-append">
@@ -90,10 +90,10 @@
                     
                                       
                     <td>
-                        <a class="btn btn-outline-info" href="/update_carousel/<%= carousel.carousel_id %>">編輯</a>
+                        <a class="btn btn-outline-info" href="<%= baseUrl %>/update_carousel/<%= carousel.carousel_id %>">編輯</a>
                     </td>  
                     <td>
-                        <a class="btn btn-outline-danger" href="/delete_carousel/<%= carousel.carousel_id %>" onclick="return confirmDelete();">刪除</a>
+                        <a class="btn btn-outline-danger" href="<%= baseUrl %>/delete_carousel/<%= carousel.carousel_id %>" onclick="return confirmDelete();">刪除</a>
                    </td>   
                 </tr>
             <% }); %>

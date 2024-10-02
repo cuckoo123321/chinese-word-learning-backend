@@ -1,4 +1,7 @@
 const adminModel = require('../models/adminModel');
+require('dotenv').config(); 
+const baseUrl = process.env.BASE_URL || '/CKIS_API'; 
+
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
@@ -14,7 +17,7 @@ const adminController = {
         // 檢驗欄位是否空白
         if (!admin_name || !admin_password) {
             req.flash('errorMessage', '欄位不可空白');
-            return res.redirect('/login'); 
+            return res.redirect(`${baseUrl}/login`); 
         }
         
     
@@ -22,17 +25,17 @@ const adminController = {
             if (err) {
                 req.flash('errorMessage', '系統錯誤，請稍後再試');
                 console.error('Database error:', err); 
-                return res.redirect('/login'); 
+                return res.redirect(`${baseUrl}/login`); 
             }
             if (!admin) {
                 req.flash('errorMessage', '使用者不存在');
-                return res.redirect('/login'); 
+                return res.redirect(`${baseUrl}/login`); 
             }
             // 檢查使用者是否被停權
             if (admin.admin_disabled === 1) {
                 req.flash('errorMessage', '此帳號已被停權，無法登入');
                 console.log(`Login failed: Account ${admin_name} is disabled`);
-                return res.redirect('/login');
+                return res.redirect(`${baseUrl}/login`);
             }
     
             // 檢查雜湊密碼是否正確
@@ -40,19 +43,19 @@ const adminController = {
                 if (err) {
                     req.flash('errorMessage', '系統錯誤，請稍後再試');
                     console.error('Bcrypt error:', err); 
-                    return res.redirect('/login');
+                    return res.redirect(`${baseUrl}/login`);
                 }
                 if (!isSuccess) {
                     req.flash('errorMessage', '帳號或密碼錯誤或被停權');
                     console.log(`Login failed: Incorrect password for user ${admin_name},${admin_password}, ${admin.admin_password}`);
-                    return res.redirect('/login'); 
+                    return res.redirect(`${baseUrl}/login`); 
                 }
     
                 // 儲存使用者資訊和權限等級到 session
                 req.session.admin_name = admin.admin_name;
                 req.session.admin_full_name = admin.admin_full_name;
                 req.session.admin_permission_level = admin.admin_permission_level;
-                res.redirect('/');
+                res.redirect(`${baseUrl}/`);
                 });
         });
     },
@@ -66,13 +69,13 @@ const adminController = {
     handleAdd: (req, res, next) => {
         if (!req.session.admin_permission_level || req.session.admin_permission_level !== 'Super') {
             req.flash('errorMessage', '您沒有權限進行此操作。');
-            return res.redirect('/');
+            return res.redirect(`${baseUrl}/`);
         }
         const { admin_name, admin_password, admin_full_name, admin_email, admin_permission_level, admin_disabled } = req.body;
     
         if (!admin_name || !admin_password || !admin_full_name || !admin_email || !admin_permission_level || admin_disabled === undefined) {
             req.flash('errorMessage', '缺少必要欄位');
-            return res.redirect('/adminAdd');
+            return res.redirect(`${baseUrl}/adminAdd`);
         }
     
         // 將 admin_disabled 轉換成布林值
@@ -87,7 +90,7 @@ const adminController = {
             
             if (existingAdmin) {
                 req.flash('errorMessage', '帳號已存在');
-                return res.redirect('/adminAdd'); 
+                return res.redirect(`${baseUrl}/adminAdd`); 
             }
     
             // 如果 admin_name 不存在，進行密碼雜湊加密
@@ -110,14 +113,14 @@ const adminController = {
                     if (err) {
                         if (err.code === 'ER_DUP_ENTRY') {
                             req.flash('errorMessage', '帳號已存在');
-                            return res.redirect('/adminAdd'); 
+                            return res.redirect(`${baseUrl}/adminAdd`); 
                         }
                         req.flash('errorMessage', '資料庫錯誤');
                         console.error('Database error:', err);
                         return next();
                     }
                     req.session.admin_name = admin_name;
-                    res.redirect('/adminList');
+                    res.redirect(`${baseUrl}/adminList`);
                 });
             });
         });
@@ -126,7 +129,7 @@ const adminController = {
 
     logout: (req, res) => {
         req.session.admin_name = null;
-        res.redirect('/');
+        res.redirect(`${baseUrl}/`);
     },
     
     getAll: (req, res)=>{
@@ -148,19 +151,19 @@ const adminController = {
     
         if (adminPermissionLevel !== 'Super') {
             req.flash('errorMessage', '您沒有權限進行此操作');
-            return res.redirect('/adminList');
+            return res.redirect(`${baseUrl}/adminList`);
         }
         
         adminModel.countSuperAdmins((err, count) => {
             if (err) {
                 console.error('計算 Super 管理員數量時出錯:', err);
                 req.flash('errorMessage', '系統錯誤，請稍後再試');
-                return res.redirect('/adminList');
+                return res.redirect(`${baseUrl}/adminList`);
             }
     
             if (count === 1) {
                 req.flash('errorMessage', '無法刪除最後一個擁有 Super 權限的管理員');
-                return res.redirect('/adminList');
+                return res.redirect(`${baseUrl}/adminList`);
             }
     
             // 如果有超過一個「Super」管理員，則繼續刪除操作
@@ -169,7 +172,7 @@ const adminController = {
                     console.error('刪除管理員時出錯:', err);
                     req.flash('errorMessage', '系統錯誤，請稍後再試');
                 }
-                res.redirect('/adminList');
+                res.redirect(`${baseUrl}/adminList`);
             });
         });
     },
@@ -181,7 +184,7 @@ const adminController = {
             if (err) {
                 console.error('Error fetching admin for update:', err);
                 req.flash('errorMessage', '系統錯誤，請稍後再試');
-                return res.redirect('/adminList');
+                return res.redirect(`${baseUrl}/adminList`);
             }
     
             // Render the update page and pass the permission level
@@ -196,7 +199,7 @@ const adminController = {
     handleUpdate: (req, res) => {
         if (!req.session.admin_permission_level || req.session.admin_permission_level !== 'Super') {
             req.flash('errorMessage', '您沒有權限進行此操作。');
-            return res.redirect('/');
+            return res.redirect(`${baseUrl}/`);
         }
     
         const { admin_name, admin_password, admin_full_name, admin_email, admin_permission_level, admin_disabled } = req.body;
@@ -204,20 +207,20 @@ const adminController = {
         // 檢查欄位是否為空值
         if (!admin_name || !admin_full_name || !admin_email || !admin_permission_level || admin_disabled === undefined) {
             req.flash('errorMessage', '缺少必要欄位');
-            return res.redirect(`/update_admin/${req.params.id}`);
+            return res.redirect(`${baseUrl}/update_admin/${req.params.id}`);
         }
     
         // 先檢查啟用的「Super」管理員數量
         adminModel.countActiveSuperAdmins((err, count) => {
             if (err) {
                 req.flash('errorMessage', '系統錯誤，請稍後再試');
-                return res.redirect(`/update_admin/${req.params.id}`);
+                return res.redirect(`${baseUrl}/update_admin/${req.params.id}`);
             }
     
             // 如果只剩一位啟用的「Super」管理員
             if (count === 1 && admin_disabled === '1' && req.session.admin_name === admin_name) {
                 req.flash('errorMessage', '您是唯一啟用的Super管理員，無法將自己設為停權。');
-                return res.redirect(`/update_admin/${req.params.id}`);
+                return res.redirect(`${baseUrl}/update_admin/${req.params.id}`);
             }
     
             // 如果密碼欄位有值，則進行密碼加密
@@ -225,7 +228,7 @@ const adminController = {
                 bcrypt.hash(admin_password, saltRounds, (err, hash) => {
                     if (err) {
                         console.error('Bcrypt error:', err);
-                        return res.redirect(`/update_admin/${req.params.id}`);
+                        return res.redirect(`${baseUrl}/update_admin/${req.params.id}`);
                     }
     
                     const admin_updated_at = new Date();
@@ -241,9 +244,9 @@ const adminController = {
                         (err) => {
                             if (err) {
                                 console.error('Error:', err);
-                                return res.redirect(`/update_admin/${req.params.id}`);
+                                return res.redirect(`${baseUrl}/update_admin/${req.params.id}`);
                             }
-                            res.redirect('/adminList');
+                            res.redirect(`${baseUrl}/adminList`);
                         }
                     );
                 });
@@ -261,9 +264,9 @@ const adminController = {
                     (err) => {
                         if (err) {
                             console.error('Error:', err);
-                            return res.redirect(`/update_admin/${req.params.id}`);
+                            return res.redirect(`${baseUrl}/update_admin/${req.params.id}`);
                         }
-                        res.redirect('/adminList');
+                        res.redirect(`${baseUrl}/adminList`);
                     }
                 );
             }
@@ -279,7 +282,8 @@ const adminController = {
             }
             res.render('admin/adminList', {
                 admin: results,
-                admin_full_name: req.session.admin_full_name
+                admin_full_name: req.session.admin_full_name,
+                admin_permission_level: req.session.admin_permission_level
             });
         });
     }   

@@ -27,7 +27,7 @@
                             <strong><%= errorMessage %></strong>
                         </div>
                     <% } %>
-                    <form method="POST" action="/login" data-bitwarden-watching="1">
+                    <form method="POST" action="<%= baseUrl %>/login" data-bitwarden-watching="1">
                         <div class="form-group list">
                             <input name="admin_name" type="text" class="form-control" placeholder="請輸入帳號" required="required">
                         </div>

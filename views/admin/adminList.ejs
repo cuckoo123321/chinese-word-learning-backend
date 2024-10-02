@@ -11,12 +11,12 @@
         <div class="row">
             <% if(admin_name) {  %>  
             <div class="col-md-3 d-flex">
-                <a class="btn btn-primary mb-2 add" href="/adminAdd">新增管理員</a>
-                <a class="btn btn-primary mb-2" href="/adminList">顯示所有列表</a>
+                <a class="btn btn-primary mb-2 add" href="<%= baseUrl %>/adminAdd">新增管理員</a>
+                <a class="btn btn-primary mb-2" href="<%= baseUrl %>/adminList">顯示所有列表</a>
             </div>
         
             <div class="col-md-9">
-                <form class="mb-3" role="search" method="GET" action="/search">
+                <form class="mb-3" role="search" method="GET" action="<%= baseUrl %>/search">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="請輸入姓名／帳號／信箱關鍵字" aria-label="Search" name="keyword">
                         <div class="input-group-append">
@@ -129,11 +129,11 @@
                     
                                       
                     <td>
-                        <a class="btn btn-outline-info" href="/update_admin/<%= admin.admin_id %>">編輯</a>
+                        <a class="btn btn-outline-info" href="<%= baseUrl %>/update_admin/<%= admin.admin_id %>">編輯</a>
                     </td> 
                     <% if (admin_permission_level === 'Super') { %> 
                     <td>
-                        <a class="btn btn-outline-danger" href="/delete_admin/<%= admin.admin_id %>" onclick="return confirmDelete();">刪除</a>
+                        <a class="btn btn-outline-danger" href="<%= baseUrl %>/delete_admin/<%= admin.admin_id %>" onclick="return confirmDelete();">刪除</a>
                    </td> 
                    <% } %>  
                 </tr>

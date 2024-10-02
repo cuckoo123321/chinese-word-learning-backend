@@ -19,7 +19,7 @@
                     </div>
                 <% } %>
 
-                <form method="POST" action="/update_article/<%= article.article_id %>" data-bitwarden-watching="1">
+                <form method="POST" action="<%= baseUrl %>/update_article/<%= article.article_id %>" data-bitwarden-watching="1">
 
                     <div class="form-group list">
                         <label class="form-label">名稱：</label>
@@ -73,7 +73,7 @@
                     <div class="form-group list mt-4">
                         <input type="submit" class="btn btn-success btn_margin" onclick="return confirm('確認更新資料？');"/>
                         <button type="button" class="btn btn-warning btn_margin" id="clearButton">清空</button>
-                        <a class="btn btn-secondary btn_margin" href="/articleList">取消</a>
+                        <a class="btn btn-secondary btn_margin" href="<%= baseUrl %>/articleList">取消</a>
                     </div>
                 </form>
             </div>

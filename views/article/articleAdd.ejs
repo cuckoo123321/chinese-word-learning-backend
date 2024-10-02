@@ -25,7 +25,7 @@
                 </div>
                 <% } %>
     
-                <form method="POST" action="/articleAdd" data-bitwarden-watching="1">    
+                <form method="POST" action="<%= baseUrl %>/articleAdd" data-bitwarden-watching="1">    
                     <div class="form-group list">
                         <label class="form-label">名稱：</label>
                         <input name="article_title" type="text" class="form-control" placeholder="請輸入論文名稱" required="required">
@@ -68,7 +68,7 @@
                     <div class="form-group list mt-4">
                         <input type="submit" class="btn btn-success btn_margin" />
                         <button type="button" class="btn btn-warning btn_margin" id="clearButton">清空</button>
-                        <a class="btn btn-secondary btn_margin" href="/eventList">取消</a>
+                        <a class="btn btn-secondary btn_margin" href="<%= baseUrl %>/eventList">取消</a>
                     </div>
                 </form>
             </div>

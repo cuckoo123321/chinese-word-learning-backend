@@ -20,7 +20,7 @@
                 <% } %>
     
                 <% if (admin_permission_level === 'Super') { %>
-                <form method="POST" action="/adminAdd" data-bitwarden-watching="1">
+                <form method="POST" action="<%= baseUrl %>/adminAdd" data-bitwarden-watching="1">
                     <div class="form-group list">
                         <label for="admin_full_name" class="form-label">姓名：</label>
                         <input name="admin_full_name" type="text" class="form-control" placeholder="請輸入管理員名稱">
@@ -68,13 +68,13 @@
     
                     <div class="form-group list mt-4">
                         <input type="submit" class="btn btn-success btn_margin" />
-                        <a class="btn btn-secondary btn_margin" href="adminList">取消</a>
+                        <a class="btn btn-secondary btn_margin" href="<%= baseUrl %>/adminList">取消</a>
                     </div>
                 </form>
                 <% } else { %>
                     <p style="text-align: center; color: red; margin-top: 40px;">＊您沒有權限進行此操作＊</p>
                     <div style="text-align: center; margin-top: 40px;">
-                        <a class="btn btn-secondary" href="/adminList">返回</a>
+                        <a class="btn btn-secondary" href="<%= baseUrl %>/adminList">返回</a>
                     </div>
                 <% } %>
             </div>

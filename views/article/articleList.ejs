@@ -11,12 +11,12 @@
         <% if(admin_name) { %>  
         <div class="row">
             <div class="col-md-3 d-flex">
-                <a class="btn btn-primary mb-2 add" href="/articleAdd">新增文章</a>
-                <a class="btn btn-primary mb-2" href="/articleList">顯示所有列表</a>
+                <a class="btn btn-primary mb-2 add" href="<%= baseUrl %>/articleAdd">新增文章</a>
+                <a class="btn btn-primary mb-2" href="<%= baseUrl %>/articleList">顯示所有列表</a>
             </div>
         
             <div class="col-md-9">
-                <form class="mb-3" role="search" method="GET" action="/articleSearch">
+                <form class="mb-3" role="search" method="GET" action="<%= baseUrl %>/articleSearch">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="請輸入論文名稱/作者/期刊名稱/摘要的關鍵字" aria-label="Search" name="keyword">
                         <div class="input-group-append">
@@ -73,10 +73,10 @@
                       
                                       
                     <td>
-                        <a class="btn btn-outline-info" href="/update_article/<%= article.article_id %>">編輯</a>
+                        <a class="btn btn-outline-info" href="<%= baseUrl %>/update_article/<%= article.article_id %>">編輯</a>
                     </td>  
                     <td>
-                        <a class="btn btn-outline-danger" href="/delete_article/<%= article.article_id %>" onclick="return confirmDelete();">刪除</a>
+                        <a class="btn btn-outline-danger" href="<%= baseUrl %>/delete_article/<%= article.article_id %>" onclick="return confirmDelete();">刪除</a>
                    </td>   
                 </tr>
             <% }); %>

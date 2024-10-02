@@ -11,12 +11,12 @@
         <% if(admin_name) { %>
         <div class="row">
             <div class="col-md-3 d-flex">
-                <a class="btn btn-primary mb-2 add" href="/userAdd">新增會員</a>
-                <a class="btn btn-primary mb-2" href="/userList">顯示所有列表</a>
+                <a class="btn btn-primary mb-2 add" href="<%= baseUrl %>/userAdd">新增會員</a>
+                <a class="btn btn-primary mb-2" href="<%= baseUrl %>/userList">顯示所有列表</a>
             </div>
         
             <div class="col-md-9">
-                <form class="mb-3" role="search" method="GET" action="/userSearch">
+                <form class="mb-3" role="search" method="GET" action="<%= baseUrl %>/userSearch">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="請輸入帳號關鍵字" aria-label="Search" name="keyword">
                         <div class="input-group-append">
@@ -59,10 +59,10 @@
                     <% let formattedUpdatedDate = UpdatedDate.toLocaleString('zh-TW', options); %>
                     <td><%= formattedUpdatedDate %></td>
                     <td>
-                        <a class="btn btn-outline-info" href="/update_user/<%= user.user_id %>">編輯</a>
+                        <a class="btn btn-outline-info" href="<%= baseUrl %>/update_user/<%= user.user_id %>">編輯</a>
                     </td>  
                     <td>
-                        <a class="btn btn-outline-danger" href="/delete_user/<%= user.user_id %>" onclick="return confirmDelete();">停權</a>
+                        <a class="btn btn-outline-danger" href="<%= baseUrl %>/delete_user/<%= user.user_id %>" onclick="return confirmDelete();">停權</a>
                    </td>   
                 </tr>
             <% }); %>

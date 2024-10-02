@@ -1,4 +1,6 @@
 const carouselModel = require('../models/carouselModel');
+require('dotenv').config(); 
+const baseUrl = process.env.BASE_URL || '/CKIS_API'; 
 const multer = require('multer'); // 用於處理上傳的中間件
 const path = require('path');
 const fs = require('fs');
@@ -33,7 +35,7 @@ function updateCarouselInDatabase(carouselID, title, link, publish, updated_at, 
             if (err) {
                 console.error('Error updating carousel:', err);
             } else {
-                res.redirect('/carouselList');
+                res.redirect(`${baseUrl}/carouselList`);
             }
         }
     );
@@ -78,7 +80,7 @@ const carouselController = {
                             req.flash('errorMessage', addErr.toString());
                             return next();
                         }    
-                        res.redirect('/carouselList');
+                        res.redirect(`${baseUrl}/carouselList`);
                     });
                 } catch (dbError) {
                     console.error('資料庫操作失敗:', dbError);
@@ -156,7 +158,7 @@ const carouselController = {
                                             console.error('Error updating carousel:', updateErr);
                                             res.status(500).send('Error updating carousel');
                                         } else {
-                                            res.redirect('/carouselList');
+                                            res.redirect(`${baseUrl}/carouselList`);
                                         }
                                     }
                                 );
@@ -175,7 +177,7 @@ const carouselController = {
                                         console.error('Error updating carousel:', updateErr);
                                         res.status(500).send('Error updating carousel');
                                     } else {
-                                        res.redirect('/carouselList');
+                                        res.redirect(`${baseUrl}/carouselList`);
                                     }
                                 }
                             );
@@ -195,7 +197,7 @@ const carouselController = {
                                 console.error('Error updating carousel:', updateErr);
                                 res.status(500).send('Error updating carousel');
                             } else {
-                                res.redirect('/carouselList');
+                                res.redirect(`${baseUrl}/carouselList`);
                             }
                         }
                     );
@@ -239,7 +241,7 @@ const carouselController = {
                             // 可以考慮返回錯誤訊息或進行其他處理
                             res.status(500).send('Error deleting carousel');
                         } else {
-                            res.redirect('/carouselList');
+                            res.redirect(`${baseUrl}/carouselList`);
                         }
                     });
                 });
@@ -252,7 +254,7 @@ const carouselController = {
                         console.error('Error deleting carousel:', deleteErr);
                         res.status(500).send('Error deleting carousel');
                     } else {
-                        res.redirect('/carouselList');
+                        res.redirect(`${baseUrl}/carouselList`);
                     }
                 });
             }

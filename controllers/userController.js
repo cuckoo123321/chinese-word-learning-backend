@@ -1,4 +1,6 @@
 const userModel = require('../models/userModel');
+require('dotenv').config(); 
+const baseUrl = process.env.BASE_URL || '/CKIS_API'; 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
@@ -30,7 +32,7 @@ const userController = {
                     req.flash('errorMessage', err.toString());
                     return next();
                 }
-                res.redirect('/userList');
+                res.redirect(`${baseUrl}/userList`);
             })
         })
     },
@@ -68,7 +70,7 @@ const userController = {
                     if(err){
                         console.log('Error:', err);
                     }else{
-                        res.redirect('/userList');
+                        res.redirect(`${baseUrl}/userList`);
                     }
                     
                 }
@@ -84,7 +86,7 @@ const userController = {
             if (err) {
                 console.error('Soft delete error:', err);
             } else {
-                res.redirect('/userList');
+                res.redirect(`${baseUrl}/userList`);
             }
         })
     },

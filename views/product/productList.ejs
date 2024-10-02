@@ -21,12 +21,12 @@
     <% if(admin_name) { %>   
         <div class="row">
             <div class="col-md-3 d-flex">
-                <a class="btn btn-primary mb-2 add" href="/productAdd">新增產品</a>
-                <a class="btn btn-primary mb-2" href="/productList">顯示所有列表</a>
+                <a class="btn btn-primary mb-2 add" href="<%= baseUrl %>/productAdd">新增產品</a>
+                <a class="btn btn-primary mb-2" href="<%= baseUrl %>/productList">顯示所有列表</a>
             </div>
         
             <div class="col-md-9">
-                <form class="mb-3" role="search" method="GET" action="/productSearch">
+                <form class="mb-3" role="search" method="GET" action="<%= baseUrl %>/productSearch">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="請輸入編碼／名稱／分類／作者／出版社的關鍵字" aria-label="Search" name="keyword">
                         <div class="input-group-append">
@@ -93,10 +93,10 @@
                     <% let UpdatedDate = product.product_updated_at; %>                    
                     <% let formattedUpdatedDate = UpdatedDate.toLocaleString('zh-TW', options); %>    
                     <td>
-                        <a class="btn btn-outline-info" href="/update_product/<%= product.product_id %>">編輯</a>
+                        <a class="btn btn-outline-info" href="<%= baseUrl %>/update_product/<%= product.product_id %>">編輯</a>
                     </td>  
                     <td>
-                        <a class="btn btn-outline-danger" href="/delete_product/<%= product.product_id %>" onclick="return confirmDelete();">刪除</a>
+                        <a class="btn btn-outline-danger" href="<%= baseUrl %>/delete_product/<%= product.product_id %>" onclick="return confirmDelete();">刪除</a>
                    </td>   
                 </tr>
             <% }); %>
