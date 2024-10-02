@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const flash = require('connect-flash');
 const app = express();
+require('dotenv').config();
 const port = process.env.PORT || 5001;
 const adminController = require('./controllers/adminController');
 const userController = require('./controllers/userController');
